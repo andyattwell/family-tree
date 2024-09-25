@@ -1,0 +1,417 @@
+@import '~bootstrap/scss/bootstrap';
+
+:root {
+    --main-bg-color-c: #938ac0;
+    --main-bg-color: #786fa6;
+	--main-bg-color-o: #544d7a;
+
+	--sidebar-o: #3b3464;
+
+	--boold-line: #fff;
+	--boold-line-c: #f7d794;
+	--boold-line-o: #f3a683;
+
+	--parent-node-o: #ea8685;
+	--parent-node:#b9adf1;
+	
+	--node-color: #778beb;
+	--node-color-o: #f3a683;
+}
+
+* {margin: 0; padding: 0;}
+
+body,html{
+	min-height: 100%;
+	height: 100%;
+	position: absolute;
+	width: 100%; 
+	z-index:10;
+	background-color:var(--main-bg-color);
+	overflow: hidden;
+}
+
+@media only screen and (max-width: 600px) {
+    body {
+        overflow: visible;
+    }
+}
+
+#root{
+	display: flex;
+	width: 100vw;
+	height: 100vh;
+}
+
+#app{
+	width: 100vw;
+	height: 100vh;
+}
+.modal{
+	z-index: 1060;
+}
+
+.navbar-inverse{
+	background-image: none;
+	background-color: var(--main-bg-color-o);
+	border: none;
+	position: fixed;
+	top:0;left:0;
+	width: 100%;
+	z-index: 1000;
+	
+}
+
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a{
+	color:#fff;
+}
+
+.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:focus, .navbar-inverse .navbar-nav>.open>a:hover{
+	background-image: none;
+}
+
+.navbar-nav > li{
+	background: rgba(0, 0, 0, .1)
+}
+.navbar-nav > li:hover{
+	background: rgba(0, 0, 0, .4);
+	
+}
+
+.main-container{
+	width: 100%;
+	height: 100%;
+  background: black;
+}
+
+#sidebar{
+	height: 100%;
+    width: 400px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: -400px;
+	background-color:#232323;
+	color:#fff;
+	text-align: left;
+    overflow-x: hidden;
+	transition: 0.5s;
+	z-index: 10000;
+	zoom:1 !important;
+}
+
+#sidebar.open{
+	left:0;
+}
+
+.sidebar-back{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .1);
+    z-index: 0;
+    display: none;
+    top: 0;
+	left: 0;
+	transition: all .3s;
+}
+
+#sidebar.open+.sidebar-back{
+	display: block;
+    background: rgba(0, 0, 0, .3);
+    z-index: 100;
+}
+
+#sidebar .closebtn {
+	position: absolute;
+	top: 0;
+	right: 25px;
+	font-size: 36px;
+	margin-left: 50px;
+	color:#fff;
+}
+
+#sidebar .closebtn:hover{
+	text-decoration: none;
+	color:#f7d794;
+}
+
+#sidebar .sidebar-title{
+	background-color:var(--sidebar-o);
+	height:50px;
+	color:#fff;
+}
+#sidebar .sidebar-title h3{
+	margin:0;
+	padding:10px 0 0 10px;
+}
+
+#sidebar .sidebar-content{
+	padding: 10px;
+}
+
+.tree-container{
+	transition: all 0.5s;
+    padding: 20px;
+}
+
+.tree-container.open{
+	margin-left:400px;
+}
+
+#tree{
+    padding: 30px;
+}
+
+#tree > ul::after{
+	display:none !important;
+}
+
+.tree-options{
+	position:fixed;
+	bottom:0;
+	right: 0;
+	width:200px;
+	height: 100px;
+	background: #fff;
+	z-index: 1000;
+}
+
+#tree ul { 
+	transition: all 0.6s;
+	display: flex;
+	position: relative;
+	text-align: center;
+}
+
+
+#tree li {
+	list-style-type: none;
+	padding: 20px 5px 0 5px;
+	transition: all 0.6s;
+	position: relative;
+	margin:0 auto;
+}
+/*We will use ::before and ::after to draw the connectors*/
+
+#tree li::before, #tree li::after{
+	content: '';
+	position: absolute; 
+	top: 0; 
+	right: 50%;
+	border-top: 3px solid var(--boold-line);
+	width: 51%; 
+	height: 40px;
+	z-index: -1;
+	transition: all 0.6s;
+}
+#tree li::after{
+	right: auto; 
+	left: calc(50% - 1px);
+	border-left: 3px solid var(--boold-line);
+}
+
+#tree ul:first-child::after{
+	display:none;
+}
+
+#tree ul::after{
+	display: block;
+    content: "";
+    height: 79px;
+    border-left: 3px solid var(--boold-line);
+    left: calc(50% - 2px);
+    position: absolute;
+    top: -75px;
+    z-index:-1;
+
+}
+
+/*Remove left connector from first child and 
+right connector from last child*/
+#tree li:first-child::before, #tree li:last-child::after{
+	border: 0 none;
+}
+/*Adding back the vertical connector to the last nodes*/
+#tree li:last-child::before{
+	border-right: 3px solid var(--boold-line);
+	-webkit-transform: translateX(1px);
+	-moz-transform: translateX(1px);
+	transform: translateX(1px);
+	/* border-radius: 5px;
+	-webkit-border-radius: 0 5px 0 0;
+	-moz-border-radius: 0 5px 0 0; */
+}
+#tree li:first-child::after{
+	/* border-radius: 5px 0 0 0; */
+	/* -webkit-border-radius: 5px 0 0 0; */
+	/* -moz-border-radius: 5px 0 0 0; */
+}
+
+
+#tree li .detalles{
+	min-width: 185px;
+	max-width: 390px;
+    height: 50px;
+	text-align: center;
+	margin: 0 auto 20px;
+}
+
+#tree li .persona{
+    width: 185px;
+	height: 50px;
+	display: inline-block;
+	margin:0 5px;
+}
+
+.persona .name{
+	width: 185px;
+    height: 50px;
+	transition: all 0.6s;
+	margin:0 auto;
+	display: table;
+	background: var(--main-bg-color);
+	color:#fff;
+}
+
+.persona .name > div:nth-child(1){
+	display: table-cell;
+    vertical-align: middle;
+}
+
+.persona .name > div span{
+	font-weight: bold;
+}
+
+.persona .name > div small{
+	clear: both;
+	display: block
+}
+
+.persona .name::before{
+	position: absolute;
+    width: 26px;
+    height: 26px;
+    border: 4px solid var(--main-bg-color);
+    background: var(--node-color);
+    display: block;
+    content: "";
+    border-radius: 40px;
+    left: calc(50% - 13px);
+    top: -11px;
+}
+
+/*Time to add downward connectors from parents*/
+.persona+ ul::before{
+	content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    border-left: 3px solid var(--boold-line);
+    width: 0;
+    height: 24px;
+    z-index: -1;
+}
+
+.active .persona .name{
+	color: #fff;
+	background: var(--main-bg-color-c)
+}
+
+.nodo .active .principal::before,
+.nodo .active .pareja::before{
+	background: var(--parent-node-o);
+	border-color: var(--main-bg-color);
+	color:#fff;
+}
+
+.nodo .active .name::before{
+	background: var(--boold-line-o);
+}
+
+.active ul::after,.active li::before,.active li::after{
+	border-color: var(--boold-line-c) !important;
+}
+
+.nodo .persona:hover .name:hover{
+	background: var(--node-color-o);
+	color:#fff;
+	cursor: pointer
+}
+
+.nodo .persona:hover .name:hover::before{
+	background: var(--node-color-o);
+}
+
+/* Color de las lineas que unen a los nodos */
+.nodo .active li::before,
+.nodo .active li::after,
+.nodo .active ul::before,
+.active ul::after,
+.nodo .active .pareja::before
+{
+	border-color: var(--boold-line-c);
+}
+
+
+
+.persona-popover{
+	width: 300px;
+}
+
+.popover-title{
+	float:left;
+	width: 100%;
+	padding:0
+}
+
+.popover-title > div > span{
+	width:127px;
+	padding: 8px;
+    float: left;
+}
+
+.persona-popover .btn-toolbar{
+	float:right;
+	margin:0;
+}
+
+.persona-popover .btn-toolbar .btn{
+	margin:0;
+	width:100%;
+	border-radius: 0 3px 0 0;
+}
+
+.persona .popover-content h3{
+	margin: 0 0 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.persona .popover-content p{
+	margin-bottom: 3px;
+}
+
+.persona .popover-contained .childeren-list{
+	padding-top: 0 !important;
+	margin-left:10px;
+}
+
+.persona .popover-contained ul{
+	padding:0;
+}
+
+
+.persona .popover-contained ul li{
+	position: relative;
+    display: block;
+    padding: 6px 15px;
+    margin-bottom: -1px;
+	border: 1px solid #ddd;
+	float: left;
+	width: 100%;
+	text-align: left;
+}
+
+
+.persona .childeren-list li::before, .childeren-list li::after{
+	display: none;
+}
