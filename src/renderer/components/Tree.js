@@ -53,7 +53,6 @@ class Tree extends Component {
   }
 
   render() {
-
     var { selected, tree, zoom } = this.props;
 
     window.selected = selected;

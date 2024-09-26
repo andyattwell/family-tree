@@ -1,17 +1,24 @@
-import React, { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useDrag } from '@use-gesture/react';
 import { animated, useSpring } from '@react-spring/three';
-import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import getMinPosition from '../helpers';
+import { Person } from '../types';
 
-export default function Obj({ setIsDragging, floorPlane, item }) {
-  const [pos, setPos] = useState(item?.position || [0, 1, 0]);
-  const { size, viewport } = useThree();
-  const aspect = size.width / viewport.width;
+interface ObjProps {
+  setIsDragging: (status: boolean, item: Person, pos: THREE.Vector3) => void;
+  onContexMenu: (e: any, item: Person) => void;
+  floorPlane: THREE.Plane;
+  item: Person;
+}
 
+export default function Obj(props: ObjProps) {
+  const { setIsDragging, onContexMenu, floorPlane, item } = props;
+
+  const [pos, setPos] = useState(
+    new THREE.Vector3(item.position.x, 0.3, item.position.z),
+  );
   const planeIntersectPoint = new THREE.Vector3();
-
-  const dragObjectRef = useRef();
 
   const [spring, api] = useSpring(() => ({
     // position: [0, 0, 0],
@@ -23,26 +30,48 @@ export default function Obj({ setIsDragging, floorPlane, item }) {
 
   const bind = useDrag(
     ({ active, movement: [x, y], timeStamp, event }) => {
-      if (active) {
-        event.ray.intersectPlane(floorPlane, planeIntersectPoint);
-        setPos([planeIntersectPoint.x, 1.5, planeIntersectPoint.z]);
+      try {
+        if (active) {
+          event.ray.intersectPlane(floorPlane, planeIntersectPoint);
+
+          let posX = planeIntersectPoint.x;
+          let posZ = planeIntersectPoint.z;
+          // Check that y is not lower than it's parents
+          const min = getMinPosition(item);
+          if (posZ < min) {
+            posZ = min;
+          }
+
+          setPos(new THREE.Vector3(posX, 0.3, posZ));
+        }
+
+        setIsDragging(active, item, pos);
+
+        api.start({
+          position: pos,
+        });
+      } catch (error) {
+        console.log('ERROR', error);
+        setIsDragging(false);
       }
 
-      setIsDragging({ active, item, pos });
-
-      api.start({
-        // position: active ? [x / aspect, -y / aspect, 0] : [0, 0, 0],
-        position: pos,
-        scale: active ? 1.2 : 1,
-        // rotation: [y / aspect, x / aspect, 0],
-      });
       return timeStamp;
     },
     { delay: true },
   );
 
+  const handleContexMenu = (e) => {
+    onContexMenu(e, item);
+  };
+
   return (
-    <animated.mesh {...spring} {...bind()} castShadow>
+    <animated.mesh
+      {...spring}
+      {...bind()}
+      test={item.id}
+      castShadow
+      onContextMenu={handleContexMenu}
+    >
       <boxGeometry args={[1, 1, 1]} />
       {/* <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} /> */}
       <meshNormalMaterial attach="material" />

@@ -1,58 +1,22 @@
-import { useRef, useState, useLayoutEffect } from 'react';
+import { useState } from 'react';
 import { Canvas, extend, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { OrthographicCamera, OrbitControls } from '@react-three/drei';
 import Obj from './Obj';
-
-interface Tree {
-  uid: string;
-  name: string;
-  position: THREE.Vector3;
-  parents: Array<Tree>;
-  children: Array<Tree>;
-}
-
-interface Props {
-  /** The text to display inside the button */
-  tree: Array<Tree>;
-}
-
-function Box(props) {
-  // This reference will give us direct access to the mesh
-  const meshRef = useRef();
-  // Set up state for the hovered and active state
-  const [hovered, setHover] = useState(false);
-  const [active, setActive] = useState(false);
-  const { item } = props;
-  const { position } = item;
-  // Subscribe this component to the render-loop, rotate the mesh every frame
-  // useFrame((state, delta) => {});
-
-  function handleClick(e) {
-    setActive(!active);
-    // e.uuid
-    console.log(e);
-    props.onSelect();
-  }
-
-  return (
-    <mesh position={position} ref={meshRef} onClick={handleClick}>
-      <boxGeometry args={[1, 1, 1]} />
-      {/* <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} /> */}
-      <meshNormalMaterial attach="material" />
-    </mesh>
-  );
-}
+import { Person } from '../types';
+import { Lines } from './Line';
 
 function CameraDolly() {
   const vec = new THREE.Vector3();
   useFrame((state) => {
     const step = 0.1;
+    // const { x, y, z } = position;
     const x = 0;
     const y = 10;
     const z = 0;
 
     state.camera.position.lerp(vec.set(x, y, z), step);
+    // state.camera.position.lerp(position, step);
     state.camera.lookAt(0, 0, 0);
     state.camera.updateProjectionMatrix();
   });
@@ -60,112 +24,34 @@ function CameraDolly() {
   return null;
 }
 
-function Line({ start, end }) {
-  const ref = useRef()
-  useLayoutEffect(() => {
-    ref.current.geometry.setFromPoints([start, end].map((point) => new THREE.Vector3(...point)))
-  }, [start, end])
-  return (
-    <line ref={ref}>
-      <bufferGeometry />
-      <lineBasicMaterial color="hotpink" />
-    </line>
-  );
+interface AnimationProps {
+  tree: Person[];
+  updatePositions: (item: Person, pos: THREE.Vector3) => void;
+  onContexMenu: (e: any, item: Person) => void;
 }
 
-export default function Animation({ tree }: Props) {
-  const grid = useState(tree);
-  const canvasRef = useRef();
-  const [active, setActive] = useState(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [prevMousePos, setPrevMousePos] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
+export default function Animation(props: AnimationProps) {
+  const [active, setActive] = useState(false);
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   extend(THREE);
+  const { tree, updatePositions, onContexMenu } = props;
 
-  const [items, setItems] = useState([
-    {
-      position: [-1.2, 0, 0],
-      id: 'item1',
-    },
-    {
-      position: [1.2, 0, 0],
-      id: 'item2',
-    },
-    {
-      position: [3.6, 0, 2.4],
-      id: 'item3',
-      parents: ['item1', 'item2'],
-    },
-    {
-      position: [3.6, 0, 4.8],
-      id: 'item4',
-      parents: ['item3'],
-    },
-  ]);
+  const handleDrag = (status: boolean, item: Person, pos: THREE.Vector3) => {
+    setActive(status);
 
-  function handleMove(e) {
-    // screenX
-    // screenY
-    // clientX
-    // clientY
-    if (active) {
-      // console.log('move', e.clientX, e.clientY);
-      // console.log('move', e.pageX, e.pageY);
-      const x = (mousePos.x - e.screenX) * -0.01;
-      const y = (mousePos.y - e.screenY) * -0.01;
-      const itms = items.map((item) => {
-        if (item.id === active.id) {
-          item.position = [item.position[0] + x, 0, item.position[2] + y];
-        }
-        return item;
-      });
-      setItems(itms);
-      setMousePos({ x: e.screenX, y: e.screenY });
-      // active.position = [x, 0, y];
+    if (!status) {
+      updatePositions(item, pos);
     }
-  }
+  };
 
-  function handleSelect(item) {
-    setActive(item);
-  }
+  const onAddPerson = (e: any, item: Person): void => {
+    onContexMenu(e, item);
+  };
 
-  function Lines() {
-    return items.map((item) => {
-
-      if (item.parents?.length) {
-        return item.parents.map((p) => {
-          const parent = items.find((i) => i.id === p);
-          return (
-            <>
-              <Line
-                key={item.id + p}
-                start={[item.position[0], 0, item.position[2]]}
-                end={[parent.position[0], 0, item.position[2]]}
-              />
-              <Line
-                key={item.id + p + 2}
-                start={[parent.position[0], 0, item.position[2]]}
-                end={[parent.position[0], 0, parent.position[2]]}
-              />
-            </>
-          );
-        });
-      }
-    });
-  }
-  function handleDrag(props) {
-    const { active, item, pos } = props;
-    setActive(active);
-    if (!active) {
-      item.position = pos;
-    }
-  }
-  // useLayoutEffect(() => {
-  //   console.dir(canvasRef.current);
-  // }, [canvasRef]);
+  const planeSize = 100;
+  /// Canvas onPointerMove={handleMove}
   return (
-    <Canvas onPointerMove={handleMove}>
+    <Canvas>
       <OrthographicCamera makeDefault zoom={40} />
       <OrbitControls
         enablePan={false}
@@ -173,48 +59,46 @@ export default function Animation({ tree }: Props) {
         minZoom={10}
         maxZoom={50}
       />
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, -0.1, 0]}
-        receiveShadow
-      >
-        <planeGeometry attach="geometry" args={[10, 10]} receiveShadow />
-        <meshPhongMaterial
-          attach="material"
-          color="#ccc"
-          side={THREE.DoubleSide}
+      <CameraDolly />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+        <planeGeometry
+          attach="geometry"
+          args={[planeSize, planeSize]}
           receiveShadow
         />
+        {/* <meshPhongMaterial
+          attach="material"
+          color="red"
+          side={THREE.DoubleSide}
+          receiveShadow
+        /> */}
+        <meshStandardMaterial color="#222" />
+        {/* <meshNormalMaterial attach="material" /> */}
       </mesh>
       <gridHelper args={[10, 10, `white`, `gray`]} />
-      {/* <ambientLight intensity={Math.PI / 2} /> */}
+      <ambientLight intensity={Math.PI / 2} />
       {/* <spotLight
-        position={[10, 10, 10]}
+        position={[3, 3, 3]}
         angle={0.15}
         penumbra={1}
         decay={0}
         intensity={Math.PI}
       /> */}
-      {/* <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} /> */}
-      {items.map((item) => {
+      <pointLight position={[10, 10, 10]} decay={0} intensity={Math.PI} />
+      {tree.map((item) => {
         return (
-          // <Box
-          //   key={item.id}
-          //   item={item}
-          //   onSelect={() => {
-          //     handleSelect(item);
-          //   }}
-          // />
-          <Obj
-            setIsDragging={handleDrag}
-            item={item}
-            floorPlane={floorPlane}
-            key={item.id}
-          />
+          <mesh key={item.id}>
+            <Obj
+              setIsDragging={handleDrag}
+              onContexMenu={onContexMenu}
+              item={item}
+              floorPlane={floorPlane}
+              key={item.id}
+            />
+            <Lines item={item} />
+          </mesh>
         );
       })}
-      <Lines />
-      <CameraDolly />
     </Canvas>
   );
 }
