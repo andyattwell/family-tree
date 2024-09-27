@@ -114,10 +114,13 @@
     "jquery": "^3.7.1",
     "jquery-ui": "^1.14.0",
     "jsx-to-string": "^1.4.0",
+    "pg-hstore": "^2.3.4",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.4",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.16.0",
+    "sequelize": "^6.37.3",
+    "sqlite3": "^5.1.7",
     "three": "^0.168.0"
   },
   "devDependencies": {

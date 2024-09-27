@@ -1,61 +1,61 @@
-import { useRef, useState } from 'react';
-import {
-  Container,
-  Popover,
-  Overlay,
-  Navbar,
-  NavDropdown,
-  Nav,
-} from 'react-bootstrap';
+import { Container, Navbar, NavDropdown, Nav, NavLink } from 'react-bootstrap';
 import { Family } from '../types';
 
 interface AppNavProps {
   trees: Family[];
-  onChangeTree: (family: Family) => void;
-  onAdd: (e: any) => void;
+  family: Family | null;
+  onSelectFamily: (family: Family) => void;
+  onAddTree: (e: any) => void;
+  onAddPerson: (e: any | null) => void;
 }
 
-export default function AppNav(props: AppNavProps) {
-  const { trees, onChangeTree, onAdd } = props;
-  const [showPop, setShowPop] = useState(false);
-  const [target, setTarget] = useState();
-  const familyName = useRef('');
-  const navContainer = useRef();
+function AppNav(props: AppNavProps) {
+  const {
+    trees,
+    onSelectFamily,
+    onAddTree,
+    onAddPerson,
+    family = null,
+  } = props;
+
+  const addPerson = () => {
+    onAddPerson({ familyID: family?.id });
+  };
 
   return (
     <Navbar bg="dark" data-bs-theme="dark">
-      <Container ref={navContainer}>
+      <Container>
         <Navbar.Brand>Arbol Familiar</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="">
             <NavDropdown title="Familias" id="basic-nav-dropdown">
-              {trees.map((family) => {
+              {trees.map((f) => {
                 return (
                   <NavDropdown.Item
                     onClick={() => {
-                      onChangeTree(family);
+                      onSelectFamily(f);
                     }}
-                    key={family.title}
+                    key={f.title}
                   >
-                    {family.title}
+                    {f.title}
                   </NavDropdown.Item>
                 );
               })}
-              <NavDropdown.Item onClick={onAdd}>Agregar</NavDropdown.Item>
+              <NavDropdown.Item onClick={onAddTree}>Agregar</NavDropdown.Item>
             </NavDropdown>
-            {/* <Overlay
-              show={showPop}
-              target={target}
-              placement="bottom"
-              container={navContainer.current}
-              containerPadding={20}
-            >
-              {popover}
-            </Overlay> */}
           </Nav>
+          {family?.id ? (
+            <Nav className="">
+              <NavLink onClick={addPerson}>Add Person</NavLink>
+            </Nav>
+          ) : (
+            ''
+          )}
         </Navbar.Collapse>
       </Container>
     </Navbar>
   );
 }
+
+export default AppNav;

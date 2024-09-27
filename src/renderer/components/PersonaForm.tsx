@@ -1,47 +1,52 @@
-import React from 'react';
 import { Button, ButtonGroup } from 'react-bootstrap';
+import { useState } from 'react';
+import { Person } from '../types';
+import FamilyService from '../services/FamilyService';
 
-function PersonaForm(props) {
-  const { persona } = props;
-  console.log(persona);
+interface FormProps {
+  persona: Person | null;
+  onClose: (data: any | null) => void;
+}
 
-  const handleInputChange = (e) => {
+function PersonaForm(props: FormProps) {
+  const { persona, onClose } = props;
+  const [data, setData] = useState<any>(persona ? { ...persona } : {});
+
+  console.log({ persona });
+
+  const handleInputChange = (e: any) => {
     const { target } = e;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const { name } = target;
-    persona[name] = value;
+    const arr = data;
+    arr[name] = value;
+    setData(arr);
   };
 
-  const handleUpload = (e) => {
-    console.log('Handle Upload');
+  const handleUpload = (e: any) => {
+    console.log('Handle Upload', e);
   };
 
   const handleHide = () => {
-    props.onClose();
+    onClose(null);
   };
 
-  const reorderDate = (dateString) => {
-    let string = '';
-    if (dateString) {
-      const d = new Date(dateString).toLocaleDateString().split('/');
-      d[1] = d[1] <= 9 ? `0${d[1]}` : d[1];
-      d[0] = d[0] <= 9 ? `0${d[0]}` : d[0];
-      string = `${d[2]}-${d[1]}-${d[0]}`;
-    }
-    return string;
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
 
-    console.log(persona);
+    data.birthdate = new Date(data.birthdate);
+    data.dod = new Date(data.dod);
+    console.log({ data });
 
-    persona.birthdate = new Date(persona.birthdate);
-    persona.dod = new Date(persona.dod);
+    FamilyService.savePerson(data)
+      .then((response) => {
+        onClose(response);
+        return response;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
-    if (persona.id) {
-    } else {
-    }
     return false;
   };
 
@@ -61,7 +66,21 @@ function PersonaForm(props) {
             type="text"
             id="name"
             name="name"
-            defaultValue={persona.name}
+            defaultValue={data.name}
+            onChange={handleInputChange}
+          />
+        </label>
+      </div>
+
+      <div className="form-group mb-3">
+        <label className="control-label" htmlFor="parents">
+          Padres
+          <input
+            className="form-control"
+            type="text"
+            id="parents"
+            name="parents"
+            defaultValue={data.parents}
             onChange={handleInputChange}
           />
         </label>
@@ -77,7 +96,7 @@ function PersonaForm(props) {
                 type="date"
                 id="birthdate"
                 name="birthdate"
-                defaultValue={persona.birthdate}
+                defaultValue={data.birthdate}
                 onChange={handleInputChange}
               />
             </label>
@@ -92,7 +111,7 @@ function PersonaForm(props) {
                 type="date"
                 id="dod"
                 name="dod"
-                defaultValue={persona.dod}
+                defaultValue={data.dod}
                 onChange={handleInputChange}
               />
             </label>
@@ -104,13 +123,13 @@ function PersonaForm(props) {
         <p className="mb-0">Género</p>
         {generos.map((g) => {
           return (
-            <label key={g.value} className="radio-inline me-2" htmlFor="genero">
+            <label key={g.value} className="radio-inline me-2" htmlFor="gender">
               <input
-                id="genero"
-                name="genero"
+                id="gender"
+                name="gender"
                 type="radio"
                 value={g.value}
-                defaultChecked={persona.genero === g.value}
+                defaultChecked={data.gender === g.value}
                 onChange={handleInputChange}
                 className="me-2"
               />
@@ -128,30 +147,31 @@ function PersonaForm(props) {
             id="description"
             name="description"
             onChange={handleInputChange}
-            defaultValue={persona.description}
+            defaultValue={data.description}
           />
         </label>
       </div>
 
       <div className="form-group mb-3">
-        <label className="control-label" htmlFor="file">
+        <label className="control-label" htmlFor="photo">
           Foto
           <input
             className="form-control"
             type="file"
-            name="file"
+            id="photo"
+            name="photo"
             onChange={handleUpload}
             accept="image/*"
           />
-          {`Archivo: ${persona.php ? persona.php : ''}`}
+          {`Archivo: ${data.photo ? data.photo : ''}`}
         </label>
       </div>
 
       <div className="form-group">
+        <Button onClick={handleSubmit} variant="primary">
+          Guardar
+        </Button>
         <ButtonGroup>
-          <Button onClick={handleSubmit} variant="primary">
-            Guardar
-          </Button>
           <Button onClick={handleHide} variant="secondary">
             Cancelar
           </Button>

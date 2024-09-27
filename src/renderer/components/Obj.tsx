@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDrag } from '@use-gesture/react';
 import { animated, useSpring } from '@react-spring/three';
 import * as THREE from 'three';
-import getMinPosition from '../helpers';
+import { getMinPosition } from '../helpers';
 import { Person } from '../types';
 
 interface ObjProps {
@@ -10,14 +10,21 @@ interface ObjProps {
   onContexMenu: (e: any, item: Person) => void;
   floorPlane: THREE.Plane;
   item: Person;
+  offset: number;
 }
 
 export default function Obj(props: ObjProps) {
-  const { setIsDragging, onContexMenu, floorPlane, item } = props;
+  const { setIsDragging, onContexMenu, floorPlane, item, offset } = props;
 
-  const [pos, setPos] = useState(
-    new THREE.Vector3(item.position.x, 0.3, item.position.z),
-  );
+  let x = 0;
+  let z = 0;
+
+  if (item.position) {
+    x = item.position.x;
+    z = item.position.z;
+  }
+
+  const [pos, setPos] = useState(new THREE.Vector3(x, 0.3, z));
   const planeIntersectPoint = new THREE.Vector3();
 
   const [spring, api] = useSpring(() => ({
@@ -34,15 +41,13 @@ export default function Obj(props: ObjProps) {
         if (active) {
           event.ray.intersectPlane(floorPlane, planeIntersectPoint);
 
-          let posX = planeIntersectPoint.x;
+          const posX = planeIntersectPoint.x;
           let posZ = planeIntersectPoint.z;
-          // Check that y is not lower than it's parents
-          const min = getMinPosition(item);
+          const min = getMinPosition(item, offset);
           if (posZ < min) {
             posZ = min;
           }
-
-          setPos(new THREE.Vector3(posX, 0.3, posZ));
+          setPos(new THREE.Vector3(posX, 1, posZ));
         }
 
         setIsDragging(active, item, pos);

@@ -1,11 +1,19 @@
 import * as THREE from 'three';
 
 export interface Person {
-  id: string;
+  id?: number;
   uid?: string;
+  familyID?: number;
+
   name?: string;
+  birthdate?: string;
+  dod?: string;
+  gender?: string;
+  description?: string;
+  photo?: string;
+
   position?: THREE.Vector3;
-  parents?: Array<Person>;
+  parents?: Array<Person> | string;
   children?: Array<Person>;
 }
 

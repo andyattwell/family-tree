@@ -2,7 +2,18 @@
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'ipc-example';
+export type Channels =
+  | 'ipc-example'
+  | 'ipc-people-save'
+  | 'ipc-people'
+  | 'ipc-people-response'
+  | 'ipc-people-save-response'
+  | 'ipc-families'
+  | 'ipc-families-response'
+  | 'ipc-families-save'
+  | 'ipc-families-save-response'
+  | 'ipc-family'
+  | 'ipc-family-response';
 
 const electronHandler = {
   ipcRenderer: {
