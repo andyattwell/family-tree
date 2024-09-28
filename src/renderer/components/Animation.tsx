@@ -1,101 +1,43 @@
-import { useRef, useState } from 'react';
-import { Canvas, extend, useFrame } from '@react-three/fiber';
+import { connect } from 'react-redux';
+import { Canvas, extend } from '@react-three/fiber';
 import * as THREE from 'three';
-import { OrthographicCamera, OrbitControls } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import Obj from './Obj';
 import { Person } from '../types';
-import { Lines } from './Line';
-import { getMinPosition } from '../helpers';
+import { getTree } from '../redux/selectors';
 import FamilyService from '../services/FamilyService';
-
-// interface CameraProps {
-//   position: THREE.Vector3;
-// }
-
-function CameraDolly() {
-  const vec = new THREE.Vector3();
-  useFrame((state) => {
-    const step = 0.1;
-    const y = 100;
-
-    // state.camera.position.lerp(vec.set(position.x, y, position.z), step);
-    state.camera.position.set(0, y, 0);
-    state.camera.lookAt(0, 0, 0);
-    state.camera.updateProjectionMatrix();
-  });
-
-  return null;
-}
 
 interface AnimationProps {
   tree: Person[];
   onContexMenu: (e: any, item: Person) => void;
 }
 
-export default function Animation(props: AnimationProps) {
+function Animation(props: AnimationProps) {
   extend(THREE);
-  const [active, setActive] = useState(false);
   const planeSize = 100;
-  const [cameraPosition, setCameraPosition] = useState(
-    new THREE.Vector3(0, 40, 0),
-  );
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const { tree, onContexMenu } = props;
-  const [treeArr, setTreeArr] = useState(tree);
 
-  const updatePositions = (item: Person, pos: THREE.Vector3) => {
-    const treeCurr = [...treeArr];
-    setTreeArr([]);
-    treeCurr.map((person) => {
-      if (person.id === item.id) {
-        person.position = pos;
-      }
-
-      person.parents = person.parents?.map((parent) => {
-        if (parent.id === item.id) {
-          parent.position = pos;
-        }
-        return parent;
-      });
-
-      const min = getMinPosition(person, planeSize);
-      if (person.position && person.position.z < min) {
-        person.position.z = min;
-      }
-      FamilyService.savePerson({ id: person.id, position: person.position });
-      return person;
-    });
-    setTimeout(() => {
-      setTreeArr(treeCurr);
-    }, 1);
-  };
-
-  const handleDrag = (status: boolean, item: Person, pos: THREE.Vector3) => {
-    setActive(status);
+  const handleDrag = (
+    status: boolean,
+    item: Person,
+    position: THREE.Vector3,
+  ) => {
     if (!status) {
-      updatePositions(item, pos);
+      FamilyService.savePerson({ id: item.id, position });
     }
   };
 
-  const onAddPerson = (e: any, item: Person): void => {
-    onContexMenu(e, item);
-  };
-
-  const objsRef = useRef();
-
-  /// Canvas onPointerMove={handleMove}
   return (
     <Canvas>
       <mesh>
-        <OrthographicCamera makeDefault zoom={7} />
+        <PerspectiveCamera makeDefault zoom={5} position={[0, 100, 0]} />
         <OrbitControls
-          target={new THREE.Vector3(0, 0, 0)}
-          enablePan={false}
-          enableRotate={false}
+          // enablePan={false}
+          // enableRotate={false}
           minZoom={7}
-          maxZoom={100}
+          maxZoom={15}
         />
-        <CameraDolly />
         <mesh
           rotation={[-Math.PI / 2, 0, 0]}
           position={[0, 0, 0]}
@@ -115,19 +57,21 @@ export default function Animation(props: AnimationProps) {
           decay={0}
           intensity={Math.PI}
         />
-        <mesh ref={objsRef}>
-          {treeArr.map((item) => {
+        <mesh>
+          {Object.keys(tree).map((id: any, k: any, o: any) => {
+            const item = tree[id];
             return (
               <mesh key={item.id}>
                 <Obj
-                  setIsDragging={handleDrag}
+                  onDrag={handleDrag}
                   onContexMenu={onContexMenu}
-                  item={item}
+                  // item={item}
+                  id={item.id}
                   floorPlane={floorPlane}
                   key={item.id}
                   offset={planeSize}
+                  position={item.position}
                 />
-                {item.parents ? <Lines item={item} /> : ''}
               </mesh>
             );
           })}
@@ -136,3 +80,11 @@ export default function Animation(props: AnimationProps) {
     </Canvas>
   );
 }
+
+const mapStateToProps = (state) => {
+  const tree = getTree(state);
+  return { tree };
+};
+
+// export default TodoList;
+export default connect(mapStateToProps)(Animation);

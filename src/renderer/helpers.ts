@@ -2,7 +2,7 @@ import { Person } from './types';
 
 export function getMinPosition(item: Person, offset: number = 0) {
   let min = -offset;
-  const height = 1;
+  const height = 2;
   if (item.parents) {
     item.parents.forEach((p) => {
       const relativeZ = (p.position?.z || 0) + height;

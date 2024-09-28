@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { useRef, useLayoutEffect } from 'react';
-import { LineProps } from '../types';
+import { useRef, useLayoutEffect, useState, useEffect } from 'react';
+import { LineProps, Person } from '../types';
 
 export function Line({ start, end }: LineProps) {
   const ref = useRef();
@@ -22,17 +22,35 @@ export function Line({ start, end }: LineProps) {
   );
 }
 
-export function Lines({ item }) {
-  return item.parents?.map((parent: Person) => {
+export function Lines({ item }: { item: Person }) {
+  const [parents, setParents] = useState<Person[]>([]);
+
+  useEffect(() => {
+    if (item.parents && typeof item.parents === 'object') {
+      setParents(item.parents);
+    } else {
+      setParents([]);
+    }
+  }, [item]);
+
+  return parents.map((parent: Person) => {
+    if (!parent.position) {
+      return '';
+    }
+    const childStart = (item.position?.z || 0) - 1;
     return (
-      <mesh key={item.id + parent.id}>
+      <mesh key={item?.id + parent.id}>
         <Line
-          start={[item.position.x, 0.1, item.position.z]}
-          end={[parent.position.x, 0.1, item.position.z]}
+          start={[item.position?.x || 0, 0.1, item.position?.z]}
+          end={[item.position?.x || 0, 0.1, childStart]}
         />
         <Line
-          start={[parent.position.x, 0.1, item.position.z]}
-          end={[parent.position.x, 0.1, parent.position.z]}
+          start={[item.position?.x, 0.1, childStart]}
+          end={[parent.position.x, 0.1, childStart]}
+        />
+        <Line
+          start={[parent.position.x, 0.1, childStart]}
+          end={[parent.position.x, 0.1, parent.position?.z]}
         />
       </mesh>
     );

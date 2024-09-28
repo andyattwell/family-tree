@@ -1,5 +1,8 @@
 import { useCallback, useState } from 'react';
 import { Vector2 } from 'three';
+import { connect } from 'react-redux';
+import { setTree } from './redux/actions';
+
 import AppNav from './components/AppNav';
 import Sidebar from './components/Sidebar';
 import PersonaForm from './components/PersonaForm';
@@ -10,7 +13,11 @@ import PersonMenu from './components/PersonMenu';
 import FamilyForm from './components/FamilyForm';
 import FamilyService from './services/FamilyService';
 
-function App() {
+interface AppProps {
+  setTree: (tree: any) => void;
+}
+
+function App(props: AppProps) {
   const [trees, setTrees] = useState<Family[]>([]);
   const [family, setFamily] = useState<Family | null>(null);
   const [showSidebar, setShowSidebar] = useState(false);
@@ -18,6 +25,8 @@ function App() {
   const [menu, setMenu] = useState<MenuProps | null>(null);
   const [showFamilyForm, setShowFamilyForm] = useState(false);
   const [load, setLoad] = useState(true);
+
+  // The `state` arg is correctly typed as `RootState` already
 
   const getFamilies = useCallback(() => {
     FamilyService.getFamilies()
@@ -48,6 +57,8 @@ function App() {
           return p;
         });
         setFamily(response);
+        console.log('family', response.tree);
+        props.setTree(response.tree);
         return response;
       })
       .catch(() => {});
@@ -128,11 +139,7 @@ function App() {
         ) : (
           ''
         )}
-        {family ? (
-          <Animation tree={family.tree} onContexMenu={onContexMenu} />
-        ) : (
-          ''
-        )}
+        <Animation onContexMenu={onContexMenu} />
       </div>
 
       <FamilyForm
@@ -145,4 +152,7 @@ function App() {
   );
 }
 
-export default App;
+// export default App;
+
+export default connect(null, { setTree })(App);
+// export default AddTodo;
