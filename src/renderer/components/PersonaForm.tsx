@@ -1,5 +1,5 @@
 import { Button, ButtonGroup } from 'react-bootstrap';
-import { useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
 import { Person } from '../types';
 import FamilyService from '../services/FamilyService';
 
@@ -10,9 +10,14 @@ interface FormProps {
 
 function PersonaForm(props: FormProps) {
   const { persona, onClose } = props;
-  const [data, setData] = useState<any>(persona ? { ...persona } : {});
 
-  console.log({ persona });
+  const [data, setData] = useState<any>(
+    persona
+      ? { ...persona, parents: persona.parents?.map((p) => p.id).join(',') }
+      : {},
+  );
+
+  const [photo, setPhoto] = useState<string>(persona?.photo || '');
 
   const handleInputChange = (e: any) => {
     const { target } = e;
@@ -23,8 +28,20 @@ function PersonaForm(props: FormProps) {
     setData(arr);
   };
 
-  const handleUpload = (e: any) => {
-    console.log('Handle Upload', e);
+  const blobToDataUrl = (blob: Blob) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  const blobToBase64 = (blob: Blob) => blobToDataUrl(blob);
+  // .then((text: any) => text.slice(text.indexOf(',')));
+
+  const handleUpload = async (e: SyntheticEvent) => {
+    const file = e.target.files[0];
+    const base64 = await blobToBase64(file);
+    setPhoto(base64);
   };
 
   const handleHide = () => {
@@ -34,10 +51,10 @@ function PersonaForm(props: FormProps) {
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
-    data.birthdate = new Date(data.birthdate);
-    data.dod = new Date(data.dod);
+    data.birthdate = data.birthdate ? new Date(data.birthdate) : null;
+    data.dod = data.dod ? new Date(data.dod) : null;
+    data.photo = photo;
     console.log({ data });
-
     FamilyService.savePerson(data)
       .then((response) => {
         onClose(response);
@@ -58,18 +75,89 @@ function PersonaForm(props: FormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="persona-form">
-      <div className="form-group mb-3">
-        <label className="control-label" htmlFor="name">
-          Nombre
-          <input
-            className="form-control"
-            type="text"
-            id="name"
-            name="name"
-            defaultValue={data.name}
-            onChange={handleInputChange}
-          />
-        </label>
+      <div className="row">
+        <div className="col-7">
+          <div className="form-group mb-2">
+            <label className="control-label" htmlFor="name">
+              Nombre
+              <input
+                className="form-control"
+                type="text"
+                id="name"
+                name="name"
+                defaultValue={data.name}
+                onChange={handleInputChange}
+              />
+            </label>
+          </div>
+          <div className="form-group">
+            <label className="control-label" htmlFor="birthdate">
+              Fecha de nacimiento
+              <input
+                className="form-control"
+                type="date"
+                id="birthdate"
+                name="birthdate"
+                defaultValue={data.birthdate}
+                onChange={handleInputChange}
+              />
+            </label>
+          </div>
+          <div className="form-group">
+            <label className="control-label" htmlFor="dod">
+              Fecha de fallecimiento
+              <input
+                className="form-control"
+                type="date"
+                id="dod"
+                name="dod"
+                defaultValue={data.dod}
+                onChange={handleInputChange}
+              />
+            </label>
+          </div>
+          <div className="form-group mb-3">
+            <p className="mb-0">Género</p>
+            {generos.map((g) => {
+              return (
+                <label
+                  key={g.value}
+                  className="radio-inline me-2"
+                  htmlFor="gender"
+                >
+                  <input
+                    id="gender"
+                    name="gender"
+                    type="radio"
+                    value={g.value}
+                    defaultChecked={data.gender === g.value}
+                    onChange={handleInputChange}
+                    className="me-2"
+                  />
+                  {g.name}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+        <div className="col-5">
+          <div className="form-group mb-3">
+            <div>
+              {photo ? <img src={photo} width="100%" alt={data.name} /> : ''}
+            </div>
+            <label className="control-label" htmlFor="photo">
+              {/* Foto */}
+              <input
+                className="form-control"
+                type="file"
+                id="photo"
+                name="photo"
+                onChange={handleUpload}
+                accept="image/*"
+              />
+            </label>
+          </div>
+        </div>
       </div>
 
       <div className="form-group mb-3">
@@ -86,85 +174,17 @@ function PersonaForm(props: FormProps) {
         </label>
       </div>
 
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <div className="form-group">
-            <label className="control-label" htmlFor="birthdate">
-              Fecha de nacimiento
-              <input
-                className="form-control"
-                type="date"
-                id="birthdate"
-                name="birthdate"
-                defaultValue={data.birthdate}
-                onChange={handleInputChange}
-              />
-            </label>
-          </div>
-        </div>
-        <div className="col-md-6">
-          <div className="form-group">
-            <label className="control-label" htmlFor="dod">
-              Fecha de fallecimiento
-              <input
-                className="form-control"
-                type="date"
-                id="dod"
-                name="dod"
-                defaultValue={data.dod}
-                onChange={handleInputChange}
-              />
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div className="form-group mb-3">
-        <p className="mb-0">Género</p>
-        {generos.map((g) => {
-          return (
-            <label key={g.value} className="radio-inline me-2" htmlFor="gender">
-              <input
-                id="gender"
-                name="gender"
-                type="radio"
-                value={g.value}
-                defaultChecked={data.gender === g.value}
-                onChange={handleInputChange}
-                className="me-2"
-              />
-              {g.name}
-            </label>
-          );
-        })}
-      </div>
-
       <div className="form-group mb-3">
         <label className="control-label" htmlFor="description">
           Descripción
-          <textarea
-            className="form-control"
-            id="description"
-            name="description"
-            onChange={handleInputChange}
-            defaultValue={data.description}
-          />
         </label>
-      </div>
-
-      <div className="form-group mb-3">
-        <label className="control-label" htmlFor="photo">
-          Foto
-          <input
-            className="form-control"
-            type="file"
-            id="photo"
-            name="photo"
-            onChange={handleUpload}
-            accept="image/*"
-          />
-          {`Archivo: ${data.photo ? data.photo : ''}`}
-        </label>
+        <textarea
+          className="form-control w-100"
+          id="description"
+          name="description"
+          onChange={handleInputChange}
+          defaultValue={data.description}
+        />
       </div>
 
       <div className="form-group">

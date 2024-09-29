@@ -88,20 +88,12 @@ function App(props: AppProps) {
     setShowSidebar(true);
     setMenu(null);
     setPersona(data);
-
-    // FamilyService.savePerson({
-    //   parents: item.id,
-    //   position: item.position,
-    // }).then(() => {
-    //   family?.tree.push(data);
-    // })
   };
 
   const onContexMenu = (e: any, item: Person): void => {
-    if (e.object && (!menu || menu.item !== item)) {
+    if (!menu || menu.item?.id !== item.id) {
       setMenu({
         item,
-        // position: e.object.position,
         position: new Vector2(e.clientX, e.clientY),
       });
     } else {

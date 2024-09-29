@@ -20,9 +20,9 @@ export default function PersonMenu(props: MenuProps) {
 
   const handleAddChildren = () => {
     onAddPerson({
-      parents: String(item.id),
+      parents: [item],
       familyID: Number(item.familyID),
-      position: new Vector3(item.position?.x, 1, (item.position?.z || 0) + 2),
+      position: new Vector3(item.position?.x, 0.1, (item.position?.z || 0) + 2),
     });
   };
 
@@ -38,7 +38,7 @@ export default function PersonMenu(props: MenuProps) {
       }}
     >
       <ListGroup className="bg-dark">
-        <ListGroupItem className="bg-dark text-white" onClick={onAddPerson}>
+        <ListGroupItem className="bg-dark text-white" onClick={handleEdit}>
           Edit
         </ListGroupItem>
         <ListGroupItem className="bg-dark text-white">Add Parent</ListGroupItem>

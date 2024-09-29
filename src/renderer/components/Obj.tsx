@@ -8,6 +8,8 @@ import { Person } from '../types';
 import { Lines } from './Line';
 import { updatePositions } from '../redux/actions';
 import { getPersonById } from '../redux/selectors';
+import TextTest from './TextTest';
+import Photo from './Photo';
 
 interface ObjProps {
   onDrag: (status: boolean, item: Person, pos: THREE.Vector3) => void;
@@ -27,20 +29,17 @@ interface ObjProps {
 
 function Obj(props: ObjProps) {
   const { onDrag, onContexMenu, floorPlane, item, offset } = props;
+  const dimentions = [1, 0.25, 1];
 
   const [pos, setPos] = useState(
-    new THREE.Vector3(item.position?.x, item.position?.y, item.position?.z),
+    new THREE.Vector3(item.position?.x, 0.1, item.position?.z),
   );
   // const [pos, setPos] = useState(item.position);
   const planeIntersectPoint = new THREE.Vector3();
   const [spring, api] = useSpring(
     () => ({
       // position: [0, 0, 0],
-      position: new THREE.Vector3(
-        item.position?.x,
-        item.position?.y,
-        item.position?.z,
-      ),
+      position: new THREE.Vector3(item.position?.x, 0.1, item.position?.z),
       scale: 1,
       rotation: [0, 0, 0],
       config: { friction: 10 },
@@ -95,9 +94,12 @@ function Obj(props: ObjProps) {
         castShadow
         onContextMenu={handleContexMenu}
       >
-        <boxGeometry args={[1, 1, 1]} />
-        {/* <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} /> */}
-        <meshNormalMaterial attach="material" />
+        <Photo img={item.photo} />
+
+        <TextTest text={item.name || ''} />
+        {/* <boxGeometry args={dimentions} /> */}
+        <meshStandardMaterial color="orange" metalness={2} roughness={5} />
+        {/* <meshNormalMaterial attach="material" /> */}
       </animated.mesh>
       {item.parents ? <Lines item={item} /> : ''}
     </mesh>

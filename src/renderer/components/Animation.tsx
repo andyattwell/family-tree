@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { connect } from 'react-redux';
 import { Canvas, extend } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -17,12 +18,14 @@ function Animation(props: AnimationProps) {
   const planeSize = 100;
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const { tree, onContexMenu } = props;
+  const [dragging, setIsDragging] = useState(false);
 
   const handleDrag = (
     status: boolean,
     item: Person,
     position: THREE.Vector3,
   ) => {
+    setIsDragging(status);
     if (!status) {
       FamilyService.savePerson({ id: item.id, position });
     }
@@ -33,23 +36,11 @@ function Animation(props: AnimationProps) {
       <mesh>
         <PerspectiveCamera makeDefault zoom={5} position={[0, 100, 0]} />
         <OrbitControls
-          // enablePan={false}
-          // enableRotate={false}
+          enablePan={!dragging}
+          enableRotate={!dragging}
           minZoom={7}
           maxZoom={15}
         />
-        <mesh
-          rotation={[-Math.PI / 2, 0, 0]}
-          position={[0, 0, 0]}
-          receiveShadow
-        >
-          <planeGeometry
-            attach="geometry"
-            args={[planeSize, planeSize]}
-            receiveShadow
-          />
-          <meshStandardMaterial color="#222" />
-        </mesh>
         {/* <gridHelper args={[50, 50, `white`, `red`]} /> */}
         <ambientLight intensity={Math.PI / 2} />
         <pointLight
@@ -75,6 +66,18 @@ function Animation(props: AnimationProps) {
               </mesh>
             );
           })}
+        </mesh>
+        <mesh
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, 0, 0]}
+          receiveShadow
+        >
+          <planeGeometry
+            attach="geometry"
+            args={[planeSize, planeSize]}
+            receiveShadow
+          />
+          <meshStandardMaterial color="#222" />
         </mesh>
       </mesh>
     </Canvas>
