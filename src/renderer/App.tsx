@@ -6,7 +6,7 @@ import { setTree } from './redux/actions';
 import AppNav from './components/AppNav';
 import Sidebar from './components/Sidebar';
 import PersonaForm from './components/PersonaForm';
-import Animation from './components/Animation';
+import Animation from './components/Animation/Animation';
 import { Family, Person, MenuProps } from './types';
 import PersonMenu from './components/PersonMenu';
 // import MockData from './mock-data';
@@ -57,8 +57,7 @@ function App(props: AppProps) {
           return p;
         });
         setFamily(response);
-        console.log('family', response.tree);
-        props.setTree(response.tree);
+        // props.setTree(response.tree);
         return response;
       })
       .catch(() => {});
@@ -69,7 +68,6 @@ function App(props: AppProps) {
   };
 
   const closeSidebar = (data: any) => {
-    console.log({ data });
     family?.tree.push(data);
     if (family && data) {
       getFamily(family.id);
@@ -88,6 +86,25 @@ function App(props: AppProps) {
     setShowSidebar(true);
     setMenu(null);
     setPersona(data);
+  };
+
+  const updatePositions = (item: Person, position: THREE.Vector3) => {
+    const fam = { ...family };
+    if (!fam.tree) {
+      return false;
+    }
+    fam.tree.map((person) => {
+      if (typeof person.parents === 'object') {
+        person.parents = person.parents?.map((parent: any) => {
+          if (parent.id === item.id) {
+            parent.position = position;
+          }
+          return parent;
+        });
+      }
+      return person;
+    });
+    setFamily(fam);
   };
 
   const onContexMenu = (e: any, item: Person): void => {
@@ -114,13 +131,13 @@ function App(props: AppProps) {
       />
 
       <div className="main-container">
-        {showSidebar ? (
-          <Sidebar onClose={closeSidebar} show={showSidebar}>
+        <Sidebar onClose={closeSidebar} show={showSidebar}>
+          {persona ? (
             <PersonaForm persona={persona} onClose={closeSidebar} />
-          </Sidebar>
-        ) : (
-          ''
-        )}
+          ) : (
+            ''
+          )}
+        </Sidebar>
         {menu ? (
           <PersonMenu
             item={menu.item}
@@ -131,7 +148,15 @@ function App(props: AppProps) {
         ) : (
           ''
         )}
-        <Animation onContexMenu={onContexMenu} />
+        {family?.tree ? (
+          <Animation
+            onContexMenu={onContexMenu}
+            tree={family?.tree}
+            updatePositions={updatePositions}
+          />
+        ) : (
+          ''
+        )}
       </div>
 
       <FamilyForm

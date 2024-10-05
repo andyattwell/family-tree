@@ -18,7 +18,6 @@ function PersonaForm(props: FormProps) {
   );
 
   const [photo, setPhoto] = useState<string>(persona?.photo || '');
-
   const handleInputChange = (e: any) => {
     const { target } = e;
     const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -54,7 +53,7 @@ function PersonaForm(props: FormProps) {
     data.birthdate = data.birthdate ? new Date(data.birthdate) : null;
     data.dod = data.dod ? new Date(data.dod) : null;
     data.photo = photo;
-    console.log({ data });
+
     FamilyService.savePerson(data)
       .then((response) => {
         onClose(response);

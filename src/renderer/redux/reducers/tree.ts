@@ -1,4 +1,3 @@
-import { getMinPosition } from '../../helpers';
 import { Person } from '../../types';
 import { SET_TREE, ADD_PERSON, UPDATE_POSITION } from '../actionTypes';
 
@@ -52,11 +51,6 @@ export default (state = initialState, action: any) => {
           person.position = { x, y, z };
         }
 
-        // let min = getMinPosition(person, offset);
-        // if (person.position && person.position.z < min) {
-        //   person.position.z = min;
-        // }
-
         if (typeof person.parents === 'object') {
           person.parents = person.parents?.map((parent: any) => {
             const pa = {
@@ -70,11 +64,6 @@ export default (state = initialState, action: any) => {
             return pa;
           });
         }
-
-        // min = getMinPosition(person, offset);
-        // if (person.position && person.position.z < min) {
-        //   person.position.z = min;
-        // }
 
         newByIds[person.id] = person;
       });

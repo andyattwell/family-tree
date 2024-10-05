@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export interface Person {
-  id?: number;
+  id: number;
   uid?: string;
   familyID?: number;
 
@@ -12,8 +12,8 @@ export interface Person {
   description?: string;
   photo?: string;
 
-  position?: THREE.Vector3;
-  parents?: Array<Person> | string;
+  position: THREE.Vector3;
+  parents: Array<Person> | string;
   children?: Array<Person>;
 }
 
@@ -24,8 +24,8 @@ export interface Family {
 }
 
 export interface LineProps {
-  start: number;
-  end: number;
+  start: number[];
+  end: number[];
 }
 
 export interface MenuProps {
