@@ -18,18 +18,20 @@ interface ObjProps {
   id: number;
   offset: number;
   tree: Person[];
-  updatePositions: (
-    id: number,
-    x: number,
-    y: number,
-    z: number,
-    offset: number,
-  ) => void;
+  objDragging: number | boolean;
+  // updatePositions: (
+  //   id: number,
+  //   x: number,
+  //   y: number,
+  //   z: number,
+  //   offset: number,
+  // ) => void;
 }
 
 function Obj(props: ObjProps) {
   const itemSize = 2;
-  const { onDrag, onContexMenu, floorPlane, item, offset, tree } = props;
+  const { onDrag, onContexMenu, floorPlane, item, offset, tree, objDragging } =
+    props;
   const [pos, setPos] = useState(
     new THREE.Vector3(item.position.x, item.position.y, item.position.z),
   );
@@ -156,6 +158,9 @@ function Obj(props: ObjProps) {
 
   const bind = useDrag(
     ({ active, movement: [x, y], timeStamp, event }) => {
+      if (objDragging && objDragging !== item.id) {
+        return;
+      }
       try {
         let posX = item.position.x;
         let posZ = item.position.z;
@@ -176,8 +181,6 @@ function Obj(props: ObjProps) {
           }
           setPos(new THREE.Vector3(posX, 1, posZ));
           item.position = pos;
-        } else {
-          console.log({ position: item.position });
         }
 
         onDrag(active, item, pos);

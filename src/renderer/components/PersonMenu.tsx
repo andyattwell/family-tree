@@ -28,6 +28,7 @@ export default function PersonMenu(props: MenuProps) {
 
   return (
     <div
+      className="context-menu"
       style={{
         width,
         height,
@@ -38,17 +39,26 @@ export default function PersonMenu(props: MenuProps) {
       }}
     >
       <ListGroup className="bg-dark">
-        <ListGroupItem className="bg-dark text-white" onClick={handleEdit}>
+        <ListGroupItem
+          type="button"
+          className="bg-dark text-white"
+          onClick={handleEdit}
+        >
           Edit
         </ListGroupItem>
-        <ListGroupItem className="bg-dark text-white">Add Parent</ListGroupItem>
+        <ListGroupItem type="button" className="bg-dark text-white">
+          Add Parent
+        </ListGroupItem>
         <ListGroupItem
+          type="button"
           className="bg-dark text-white"
           onClick={handleAddChildren}
         >
           Add Children
         </ListGroupItem>
-        <ListGroupItem className="bg-dark text-white">Delete</ListGroupItem>
+        <ListGroupItem type="button" className="bg-dark text-white">
+          Delete
+        </ListGroupItem>
       </ListGroup>
     </div>
   );

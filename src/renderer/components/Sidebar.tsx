@@ -1,3 +1,5 @@
+import { Button } from 'react-bootstrap';
+
 interface Props {
   show: boolean;
   onClose: (arg?: any) => void;
@@ -8,19 +10,17 @@ function Sidebar({ show, onClose, children }: Props) {
   return (
     <div>
       <div id="sidebar" className={show ? 'open' : ''}>
-        <button
+        <Button
           type="button"
-          className="closebtn"
+          className="sm float-end me-3 mt-2"
+          variant="outline-secondary"
           onClick={(e) => {
             onClose();
             e.preventDefault();
           }}
         >
           &times;
-        </button>
-        <div className="sidebar-title">
-          <h3>Editar / Crear</h3>
-        </div>
+        </Button>
         <div className="sidebar-content">{children}</div>
       </div>
     </div>

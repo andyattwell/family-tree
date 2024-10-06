@@ -1,23 +1,121 @@
-import { Button, ButtonGroup } from 'react-bootstrap';
-import { SyntheticEvent, useState } from 'react';
+import {
+  Button,
+  ButtonGroup,
+  FormSelect,
+  ListGroup,
+  ListGroupItem,
+} from 'react-bootstrap';
+import { SyntheticEvent, useEffect, useState } from 'react';
 import { Person } from '../types';
 import FamilyService from '../services/FamilyService';
+import PersonSelect from './PersonSelect';
+import logo from '../images/person.png';
 
-interface FormProps {
-  persona: Person | null;
-  onClose: (data: any | null) => void;
+interface ParentsListProps {
+  item: Person;
+  tree: Person[];
+  onAdd: (parent: Person) => void;
+  onRemove: (parent: Person) => void;
 }
 
-function PersonaForm(props: FormProps) {
-  const { persona, onClose } = props;
+function ParentsList(props: ParentsListProps) {
+  const [showSelect, setShowSelect] = useState(false);
+  const { item, tree, onAdd, onRemove } = props;
+  const addParent = (e) => {
+    const pid = Number(e.target.value);
+    const per = tree.find((p) => p.id === pid);
+    if (per) {
+      onAdd(per);
+    }
+    setShowSelect(false);
+  };
 
-  const [data, setData] = useState<any>(
-    persona
-      ? { ...persona, parents: persona.parents?.map((p) => p.id).join(',') }
-      : {},
+  const removeParent = (parent: Person) => {
+    console.log('removeParent', parent);
+    onRemove(parent);
+  };
+
+  return (
+    <>
+      <h6>Padres:</h6>
+      <ListGroup className="parents-list mb-3">
+        {item.parents?.map((person: Person) => {
+          return (
+            <ListGroupItem key={person.id}>
+              <div className="photo-container">
+                {person.photo ? (
+                  <img src={person.photo} width="100%" alt={person.name} />
+                ) : (
+                  ''
+                )}
+              </div>
+              <span>
+                {person.id} - {person.name}
+              </span>
+              <Button
+                variant="danger"
+                className="btn-sm float-end remove-btn"
+                onClick={() => {
+                  removeParent(person);
+                }}
+              >
+                X
+              </Button>
+            </ListGroupItem>
+          );
+        })}
+        <ListGroupItem
+          className="add-parent-btn"
+          onClick={() => {
+            setShowSelect(true);
+          }}
+        >
+          <span>Agregar</span>
+        </ListGroupItem>
+      </ListGroup>
+
+      {showSelect ? (
+        <>
+          <PersonSelect onSelect={addParent} tree={tree} person={item} />
+          <Button
+            variant="secondary"
+            className="btn-sm"
+            onClick={() => setShowSelect(false)}
+          >
+            Cerrar
+          </Button>
+        </>
+      ) : (
+        ''
+      )}
+    </>
   );
+}
 
+interface PersonaFormProps {
+  persona: Person | null;
+  onClose: (data: any | null) => void;
+  tree: Person[];
+}
+
+function PersonaForm(props: PersonaFormProps) {
+  const { persona, onClose, tree } = props;
+
+  const [data, setData] = useState<any>({ parents: [] });
   const [photo, setPhoto] = useState<string>(persona?.photo || '');
+
+  useEffect(() => {
+    let p: any = {
+      parents: [],
+    };
+    if (persona) {
+      p = { ...persona };
+      p.parents = persona.parents;
+    }
+    setPhoto(persona?.photo || '');
+    setData(p);
+  }, [persona]);
+
   const handleInputChange = (e: any) => {
     const { target } = e;
     const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -25,6 +123,29 @@ function PersonaForm(props: FormProps) {
     const arr = data;
     arr[name] = value;
     setData(arr);
+  };
+
+  const handlePositionChange = (e: any) => {
+    const { target } = e;
+    const value = e.target.value;
+    const { name } = target;
+    const arr = data;
+    arr.position[name] = value;
+    setData(arr);
+  };
+
+  const handleAddParent = (parent: Person) => {
+    const d = { ...data };
+    d.parents = data.parents;
+    d.parents.push(parent);
+    setData(d);
+  };
+
+  const handleRemoveParent = (parent: Person) => {
+    console.log('handleRemoveParent', parent);
+    const d = { ...data };
+    d.parents = data.parents.filter((p: Person) => p.id !== parent.id);
+    setData(d);
   };
 
   const blobToDataUrl = (blob: Blob) =>
@@ -50,11 +171,14 @@ function PersonaForm(props: FormProps) {
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
-    data.birthdate = data.birthdate ? new Date(data.birthdate) : null;
-    data.dod = data.dod ? new Date(data.dod) : null;
-    data.photo = photo;
+    const d = { ...data };
 
-    FamilyService.savePerson(data)
+    d.birthdate = data.birthdate ? new Date(data.birthdate) : null;
+    d.dod = data.dod ? new Date(data.dod) : null;
+    d.photo = photo;
+    d.parents = data.parents.map((p: Person) => p.id).join(',');
+
+    FamilyService.savePerson(d)
       .then((response) => {
         onClose(response);
         return response;
@@ -72,105 +196,115 @@ function PersonaForm(props: FormProps) {
     { name: 'Mujer', value: 'mujer' },
   ];
 
+  const dateToString = (date: Date) => {
+    if (!date) {
+      return '';
+    }
+
+    if (typeof date === 'string') {
+      return date;
+    }
+
+    const day = `0${date.getDate()}`.slice(-2);
+    const month = `0${date.getMonth() + 1}`.slice(-2);
+
+    return `${date.getFullYear()}-${month}-${day}`;
+  };
   return (
     <form onSubmit={handleSubmit} className="persona-form">
-      <div className="row">
-        <div className="col-7">
-          <div className="form-group mb-2">
-            <label className="control-label" htmlFor="name">
-              Nombre
-              <input
-                className="form-control"
-                type="text"
-                id="name"
-                name="name"
-                defaultValue={data.name}
-                onChange={handleInputChange}
-              />
-            </label>
-          </div>
-          <div className="form-group">
-            <label className="control-label" htmlFor="birthdate">
-              Fecha de nacimiento
-              <input
-                className="form-control"
-                type="date"
-                id="birthdate"
-                name="birthdate"
-                defaultValue={data.birthdate}
-                onChange={handleInputChange}
-              />
-            </label>
-          </div>
-          <div className="form-group">
-            <label className="control-label" htmlFor="dod">
-              Fecha de fallecimiento
-              <input
-                className="form-control"
-                type="date"
-                id="dod"
-                name="dod"
-                defaultValue={data.dod}
-                onChange={handleInputChange}
-              />
-            </label>
-          </div>
-          <div className="form-group mb-3">
-            <p className="mb-0">Género</p>
-            {generos.map((g) => {
-              return (
-                <label
-                  key={g.value}
-                  className="radio-inline me-2"
-                  htmlFor="gender"
-                >
-                  <input
-                    id="gender"
-                    name="gender"
-                    type="radio"
-                    value={g.value}
-                    defaultChecked={data.gender === g.value}
-                    onChange={handleInputChange}
-                    className="me-2"
-                  />
-                  {g.name}
-                </label>
-              );
-            })}
-          </div>
-        </div>
-        <div className="col-5">
-          <div className="form-group mb-3">
-            <div>
-              {photo ? <img src={photo} width="100%" alt={data.name} /> : ''}
-            </div>
-            <label className="control-label" htmlFor="photo">
-              {/* Foto */}
-              <input
-                className="form-control"
-                type="file"
-                id="photo"
-                name="photo"
-                onChange={handleUpload}
-                accept="image/*"
-              />
-            </label>
-          </div>
+      <div className="form-group mb-3 text-center">
+        <div className="photo-container mb-3">
+          <img src={photo || logo} width="100%" alt={data.name} />
+          <label
+            className="btn btn-secondary btn-sm"
+            htmlFor="photo-file"
+            id="photo-file-btn"
+          >
+            {photo ? 'Cambiar foto' : 'Agregar foto'}
+          </label>
+          <input
+            className="form-control"
+            type="file"
+            id="photo-file"
+            name="photo"
+            onChange={handleUpload}
+            accept="image/*"
+          />
         </div>
       </div>
 
-      <div className="form-group mb-3">
-        <label className="control-label" htmlFor="parents">
-          Padres
+      <div className="form-group mb-2">
+        <label className="control-label" htmlFor="name">
+          Nombre
+        </label>
+        <input
+          className="form-control"
+          type="text"
+          id="name"
+          name="name"
+          defaultValue={data.name}
+          onChange={handleInputChange}
+        />
+      </div>
+
+      {/* Fechas */}
+      <div className="row">
+        <div className="form-group col-6">
+          <label className="control-label" htmlFor="birthdate">
+            Fecha de nacimiento
+          </label>
           <input
             className="form-control"
-            type="text"
-            id="parents"
-            name="parents"
-            defaultValue={data.parents}
+            type="date"
+            id="birthdate"
+            name="birthdate"
+            defaultValue={dateToString(data.birthdate)}
             onChange={handleInputChange}
           />
-        </label>
+        </div>
+        <div className="form-group col-6">
+          <label className="control-label" htmlFor="dod">
+            Fecha de fallecimiento
+          </label>
+          <input
+            className="form-control"
+            type="date"
+            id="dod"
+            name="dod"
+            defaultValue={dateToString(data.dod)}
+            onChange={handleInputChange}
+          />
+        </div>
+      </div>
+
+      {/* Genero */}
+      {/* <div className="form-group mb-3">
+        <p className="mb-0">Género</p>
+        {generos.map((g) => {
+          return (
+            <label key={g.value} className="radio-inline me-2" htmlFor="gender">
+              <input
+                id="gender"
+                name="gender"
+                type="radio"
+                value={g.value}
+                defaultChecked={data.gender === g.value}
+                onChange={handleInputChange}
+                className="me-2"
+              />
+              {g.name}
+            </label>
+          );
+        })}
+      </div> */}
+
+      <div className="form-group my-3">
+        <ParentsList
+          item={data}
+          tree={tree}
+          onAdd={handleAddParent}
+          onRemove={handleRemoveParent}
+        />
       </div>
 
       <div className="form-group mb-3">
@@ -185,6 +319,42 @@ function PersonaForm(props: FormProps) {
           defaultValue={data.description}
         />
       </div>
+
+      {/* Position */}
+      {/* <div className="form-group mb-3">
+        <div className="row">
+          <div className="col-4">
+            <label className="control-label">X</label>
+            <input
+              className="form-control"
+              type="number"
+              name="z"
+              defaultValue={data.position.x}
+              onChange={handlePositionChange}
+            />
+          </div>
+          <div className="col-4">
+            <label className="control-label">Y</label>
+            <input
+              className="form-control"
+              type="number"
+              name="y"
+              defaultValue={data.position.y}
+              onChange={handlePositionChange}
+            />
+          </div>
+          <div className="col-4">
+            <label className="control-label">Z</label>
+            <input
+              className="form-control"
+              type="number"
+              name="z"
+              defaultValue={data.position.z}
+              onChange={handlePositionChange}
+            />
+          </div>
+        </div>
+      </div> */}
 
       <div className="form-group">
         <Button onClick={handleSubmit} variant="primary">

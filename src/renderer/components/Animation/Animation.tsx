@@ -20,6 +20,7 @@ function Animation(props: AnimationProps) {
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const { tree, onContexMenu, updatePositions } = props;
   const [dragging, setIsDragging] = useState(false);
+  const [objDragging, setObjDragging] = useState<number | boolean>(false);
   const handleDrag = (
     status: boolean,
     item: Person,
@@ -29,6 +30,9 @@ function Animation(props: AnimationProps) {
     updatePositions(item, position);
     if (!status) {
       FamilyService.savePerson({ id: item.id, position });
+      setObjDragging(false);
+    } else {
+      setObjDragging(item.id);
     }
   };
 
@@ -63,13 +67,13 @@ function Animation(props: AnimationProps) {
               <mesh key={item.id}>
                 <Obj
                   onDrag={handleDrag}
+                  objDragging={objDragging}
                   onContexMenu={onContexMenu}
                   item={item}
                   id={item.id}
                   floorPlane={floorPlane}
                   key={item.id}
                   offset={planeSize}
-                  position={item.position}
                   tree={tree}
                 />
               </mesh>

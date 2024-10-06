@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Vector2 } from 'three';
+import { Vector2, Vector3 } from 'three';
 import { connect } from 'react-redux';
 import { setTree } from './redux/actions';
 
@@ -68,7 +68,6 @@ function App(props: AppProps) {
   };
 
   const closeSidebar = (data: any) => {
-    family?.tree.push(data);
     if (family && data) {
       getFamily(family.id);
     }
@@ -88,8 +87,8 @@ function App(props: AppProps) {
     setPersona(data);
   };
 
-  const updatePositions = (item: Person, position: THREE.Vector3) => {
-    const fam = { ...family };
+  const updatePositions = (item: Person, position: Vector3) => {
+    const fam = { ...family } as Family;
     if (!fam.tree) {
       return false;
     }
@@ -105,6 +104,7 @@ function App(props: AppProps) {
       return person;
     });
     setFamily(fam);
+    return true;
   };
 
   const onContexMenu = (e: any, item: Person): void => {
@@ -132,8 +132,15 @@ function App(props: AppProps) {
 
       <div className="main-container">
         <Sidebar onClose={closeSidebar} show={showSidebar}>
+          <div className="sidebar-title">
+            <h4>{persona?.id ? persona.name : 'Crear'}</h4>
+          </div>
           {persona ? (
-            <PersonaForm persona={persona} onClose={closeSidebar} />
+            <PersonaForm
+              persona={persona}
+              onClose={closeSidebar}
+              tree={family?.tree || []}
+            />
           ) : (
             ''
           )}
