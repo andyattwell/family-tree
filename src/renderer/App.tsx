@@ -133,10 +133,11 @@ function App(props: AppProps) {
       <div className="main-container">
         <Sidebar onClose={closeSidebar} show={showSidebar}>
           <div className="sidebar-title">
-            <h4>{persona?.id ? persona.name : 'Crear'}</h4>
+            <h4>{persona?.id ? persona.name : `Agregar a ${family?.title}`}</h4>
           </div>
           {persona ? (
             <PersonaForm
+              family={family}
               persona={persona}
               onClose={closeSidebar}
               tree={family?.members || []}

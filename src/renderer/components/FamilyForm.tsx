@@ -1,16 +1,5 @@
 import { useRef } from 'react';
-import {
-  Modal,
-  ModalDialog,
-  ModalBody,
-  ModalHeader,
-  ModalTitle,
-  ModalFooter,
-  Button,
-  Form,
-  FormGroup,
-  FormLabel,
-} from 'react-bootstrap';
+import { Modal, Button, Form, FormGroup, FormLabel } from 'react-bootstrap';
 import FamilyService from '../services/FamilyService';
 
 interface Props {
@@ -46,12 +35,15 @@ export default function FamilyForm(props: Props) {
   };
 
   return (
-    <ModalDialog>
-      <Modal show={show}>
-        <ModalHeader>
-          <ModalTitle>Crear familia</ModalTitle>
-        </ModalHeader>
-        <ModalBody>
+    <div
+      className={`modal text-white ${show ? 'show' : ''}`}
+      style={{ display: show ? 'block' : 'none' }}
+    >
+      <Modal.Dialog data-bs-theme="dark">
+        <Modal.Header closeButton>
+          <Modal.Title>Crear familia</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
           <Form>
             <FormGroup>
               <FormLabel>
@@ -60,16 +52,16 @@ export default function FamilyForm(props: Props) {
               </FormLabel>
             </FormGroup>
           </Form>
-        </ModalBody>
-        <ModalFooter>
+        </Modal.Body>
+        <Modal.Footer>
           <Button onClick={handleSubmit} variant="primary">
             Guardar
           </Button>
           <Button onClick={handleClose} variant="secondary">
             Cancelar
           </Button>
-        </ModalFooter>
-      </Modal>
-    </ModalDialog>
+        </Modal.Footer>
+      </Modal.Dialog>
+    </div>
   );
 }

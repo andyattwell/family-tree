@@ -47,11 +47,14 @@ function AppNav(props: AppNavProps) {
   return (
     <Navbar bg="dark" data-bs-theme="dark">
       <Container>
-        <Navbar.Brand>{family?.title}</Navbar.Brand>
+        <Navbar.Brand></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="">
-            <NavDropdown title="Familias" id="basic-nav-dropdown">
+          <Nav className="me-auto">
+            <NavDropdown
+              title={family ? family?.title : 'Familias'}
+              id="basic-nav-dropdown"
+            >
               {trees && trees.length
                 ? trees.map((f) => {
                     return (

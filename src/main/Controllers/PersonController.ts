@@ -32,14 +32,7 @@ export default {
           ],
         });
       } else {
-        person = await Person.create(data, {
-          include: [
-            {
-              model: Person,
-              as: 'parents',
-            },
-          ],
-        });
+        person = await Person.create(data);
       }
 
       const response = { ...person.dataValues };

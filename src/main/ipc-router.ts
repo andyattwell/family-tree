@@ -43,11 +43,11 @@ const routes = [
 
 routes.forEach((route) => {
   ipcMain.on(route.channel, async (event, arg) => {
-    // console.log(`CHANNEL ${route.channel}`, arg);
+    console.log(`CHANNEL ${route.channel}`, arg);
     const responseChannel = `${route.channel}-response`;
     try {
       const response = await route.callback(arg);
-      // console.log(`CHANNEL ${responseChannel}`, response);
+      console.log(`CHANNEL ${responseChannel}`, response);
       event.reply(responseChannel, response);
     } catch (error) {
       event.reply(responseChannel, error);

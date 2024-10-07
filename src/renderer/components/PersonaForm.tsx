@@ -29,6 +29,7 @@ function ParentsList(props: ParentsListProps) {
     }
     setShowSelect(false);
   };
+  console.log(item);
 
   const removeParent = (parent: Person) => {
     console.log('removeParent', parent);
@@ -96,10 +97,11 @@ interface PersonaFormProps {
   persona: Person | null;
   onClose: (data: any | null) => void;
   tree: Person[];
+  family: Family;
 }
 
 function PersonaForm(props: PersonaFormProps) {
-  const { persona, onClose, tree } = props;
+  const { persona, onClose, tree, family } = props;
 
   const [data, setData] = useState<any>({ parents: [] });
   const [photo, setPhoto] = useState<string>(persona?.photo || '');
@@ -214,7 +216,7 @@ function PersonaForm(props: PersonaFormProps) {
     FamilyService.savePerson(d)
       .then((response: any) => {
         data.id = response.id;
-        if (data.parents.length) {
+        if (data.parents?.length) {
           data.parents.forEach((parent: Person) => {
             handleSaveParents(parent);
           });
@@ -338,15 +340,6 @@ function PersonaForm(props: PersonaFormProps) {
       </div> */}
 
       <div className="form-group my-3">
-        <ParentsList
-          item={data}
-          tree={tree}
-          onAdd={handleAddParent}
-          onRemove={handleRemoveParent}
-        />
-      </div>
-
-      <div className="form-group mb-3">
         <label className="control-label" htmlFor="description">
           Descripción
         </label>
@@ -358,6 +351,19 @@ function PersonaForm(props: PersonaFormProps) {
           defaultValue={data.description}
         />
       </div>
+
+      {tree.length ? (
+        <div className="form-group my-3">
+          <ParentsList
+            item={data}
+            tree={tree}
+            onAdd={handleAddParent}
+            onRemove={handleRemoveParent}
+          />
+        </div>
+      ) : (
+        ''
+      )}
 
       {/* Position */}
       {/* <div className="form-group mb-3">
