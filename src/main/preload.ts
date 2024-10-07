@@ -8,12 +8,20 @@ export type Channels =
   | 'ipc-people'
   | 'ipc-people-response'
   | 'ipc-people-save-response'
+  | 'ipc-people-add-parent'
+  | 'ipc-people-add-parent-response'
+  | 'ipc-people-remove-parent'
+  | 'ipc-people-remove-parent-response'
+  | 'ipc-people-delete'
+  | 'ipc-people-delete-response'
   | 'ipc-families'
   | 'ipc-families-response'
   | 'ipc-families-save'
   | 'ipc-families-save-response'
   | 'ipc-family'
-  | 'ipc-family-response';
+  | 'ipc-family-response'
+  | 'ipc-family-delete'
+  | 'ipc-family-delete-response';
 
 const electronHandler = {
   ipcRenderer: {

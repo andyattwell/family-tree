@@ -3,7 +3,7 @@ import * as THREE from 'three';
 export interface Person {
   id: number;
   uid?: string;
-  familyID?: number;
+  familyId?: number;
 
   name?: string;
   birthdate?: string;
@@ -13,14 +13,14 @@ export interface Person {
   photo?: string;
 
   position: THREE.Vector3;
-  parents: Array<Person> | string;
+  parents: Array<Person>;
   children?: Array<Person>;
 }
 
 export interface Family {
   id: number;
   title: string;
-  tree: Person[];
+  members: Person[];
 }
 
 export interface LineProps {

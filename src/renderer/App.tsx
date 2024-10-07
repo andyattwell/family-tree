@@ -29,6 +29,7 @@ function App(props: AppProps) {
   // The `state` arg is correctly typed as `RootState` already
 
   const getFamilies = useCallback(() => {
+    console.log('getFamilies');
     FamilyService.getFamilies()
       .then((response: any) => {
         setTrees(response);
@@ -42,22 +43,12 @@ function App(props: AppProps) {
     setLoad(false);
   }
 
-  const getFamily = useCallback((familyID: number) => {
-    FamilyService.getFamily(familyID)
+  const getFamily = useCallback((familyId: number) => {
+    console.log('getFamily');
+    FamilyService.getFamily(familyId)
       .then((response: any) => {
-        response.tree = response.tree.map((p: Person) => {
-          if (typeof p.parents === 'object') {
-            p.parents = p.parents?.map((pid: any) => {
-              const per = response.tree.find((f: Person) => {
-                return Number(f.id) === Number(pid);
-              });
-              return per;
-            });
-          }
-          return p;
-        });
+        console.log({ response });
         setFamily(response);
-        // props.setTree(response.tree);
         return response;
       })
       .catch(() => {});
@@ -89,10 +80,10 @@ function App(props: AppProps) {
 
   const updatePositions = (item: Person, position: Vector3) => {
     const fam = { ...family } as Family;
-    if (!fam.tree) {
+    if (!fam.members) {
       return false;
     }
-    fam.tree.map((person) => {
+    fam.members.map((person) => {
       if (typeof person.parents === 'object') {
         person.parents = person.parents?.map((parent: any) => {
           if (parent.id === item.id) {
@@ -108,7 +99,9 @@ function App(props: AppProps) {
   };
 
   const onContexMenu = (e: any, item: Person): void => {
-    if (!menu || menu.item?.id !== item.id) {
+    console.log('onContexMenu', item);
+    e.nativeEvent.preventDefault();
+    if (item && (!menu || menu.item?.id !== item.id)) {
       setMenu({
         item,
         position: new Vector2(e.clientX, e.clientY),
@@ -116,12 +109,19 @@ function App(props: AppProps) {
     } else {
       setMenu(null);
     }
+    return false;
+  };
+
+  const onDeletePerson = (item: Person) => {
+    setMenu(null);
+    getFamily(item.familyId);
   };
 
   return (
-    <div id="app">
+    <div id="app" data-bs-theme="dark">
       <AppNav
         onSelectFamily={selectFamily}
+        onDeleteFamily={getFamilies}
         trees={trees}
         family={family}
         onAddTree={() => {
@@ -139,7 +139,7 @@ function App(props: AppProps) {
             <PersonaForm
               persona={persona}
               onClose={closeSidebar}
-              tree={family?.tree || []}
+              tree={family?.members || []}
             />
           ) : (
             ''
@@ -151,14 +151,15 @@ function App(props: AppProps) {
             position={menu.position}
             onShow={showPersona}
             onAddPerson={addPerson}
+            ondeletePerson={onDeletePerson}
           />
         ) : (
           ''
         )}
-        {family?.tree ? (
+        {family?.members ? (
           <Animation
             onContexMenu={onContexMenu}
-            tree={family?.tree}
+            tree={family?.members}
             updatePositions={updatePositions}
           />
         ) : (
@@ -168,8 +169,12 @@ function App(props: AppProps) {
 
       <FamilyForm
         show={showFamilyForm}
-        onClose={() => {
+        onClose={(f: any) => {
           setShowFamilyForm(false);
+          if (f) {
+            selectFamily(f);
+            getFamilies();
+          }
         }}
       />
     </div>

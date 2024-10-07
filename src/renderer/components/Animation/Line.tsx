@@ -71,21 +71,27 @@ export function PlaneLine({ start, end }: LineProps) {
   );
 }
 
-export function Lines({ item }: { item: Person }) {
-  const [parents, setParents] = useState<Person[]>([]);
+interface LinesProps {
+  item: Person;
+  connections: Person[];
+}
 
-  useEffect(() => {
-    if (item.parents && typeof item.parents === 'object') {
-      setParents(item.parents);
-    } else {
-      setParents([]);
-    }
-  }, [item]);
+export function Lines(props: LinesProps) {
+  const { item, connections } = props;
+  // const [parents, setParents] = useState<Person[]>([]);
+
+  // useEffect(() => {
+  //   if (item.parents && typeof item.parents === 'object') {
+  //     setParents(item.parents);
+  //   } else {
+  //     setParents([]);
+  //   }
+  // }, [item]);
 
   const itemZ = (item.position?.z || 0) - 1.5;
-  const y = 0.1;
-  return parents.map((parent: Person) => {
-    const key = (item.id || 0) + (parent.id || 0);
+  const y = 0.5;
+  return connections.map((conPerson: Person) => {
+    const key = (item.id || 0) + (conPerson.id || 0);
 
     return (
       <mesh key={key}>
@@ -103,15 +109,15 @@ export function Lines({ item }: { item: Person }) {
         /> */}
         <Line
           start={[item.position.x, y, itemZ]}
-          end={[item.position.x, y, parent.position.z + 2]}
+          end={[item.position.x, y, conPerson.position.z + 2]}
         />
         <Line
-          start={[item.position.x, y, parent.position.z + 2]}
-          end={[parent.position.x, y, parent.position.z + 2]}
+          start={[item.position.x, y, conPerson.position.z + 2]}
+          end={[conPerson.position.x, y, conPerson.position.z + 2]}
         />
         <Line
-          start={[parent.position.x, y, parent.position.z + 1]}
-          end={[parent.position.x, y, parent.position.z + 2]}
+          start={[conPerson.position.x, y, conPerson.position.z + 1]}
+          end={[conPerson.position.x, y, conPerson.position.z + 2]}
         />
       </mesh>
     );

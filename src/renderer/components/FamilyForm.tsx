@@ -11,10 +11,11 @@ import {
   FormGroup,
   FormLabel,
 } from 'react-bootstrap';
+import FamilyService from '../services/FamilyService';
 
 interface Props {
   show: boolean;
-  onClose: () => void;
+  onClose: (family: any) => void;
 }
 
 export default function FamilyForm(props: Props) {
@@ -24,9 +25,15 @@ export default function FamilyForm(props: Props) {
     if (!name.current) {
       return;
     }
-    window.electron.ipcRenderer.sendMessage('ipc-families-save', {
-      title: name.current.value,
-    });
+    console.log('handleSubmit', name.current.value);
+    FamilyService.addFamily(name.current.value)
+      .then((response) => {
+        onClose(response);
+        return response;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
     // calling IPC exposed from preload script
     window.electron.ipcRenderer.once('ipc-people-family-response', (arg) => {
@@ -42,13 +49,13 @@ export default function FamilyForm(props: Props) {
     <ModalDialog>
       <Modal show={show}>
         <ModalHeader>
-          <ModalTitle>Title</ModalTitle>
+          <ModalTitle>Crear familia</ModalTitle>
         </ModalHeader>
         <ModalBody>
           <Form>
             <FormGroup>
               <FormLabel>
-                Family name:
+                Nomber:
                 <input type="text" name="name" className="ms-3" ref={name} />
               </FormLabel>
             </FormGroup>

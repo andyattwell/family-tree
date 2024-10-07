@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 
 export default {
-  familyID: {
+  familyId: {
     type: DataTypes.BIGINT,
     allowNull: true,
   },
@@ -26,11 +26,5 @@ export default {
   },
   position: {
     type: DataTypes.TEXT,
-  },
-  parents: {
-    type: DataTypes.STRING,
-  },
-  children: {
-    type: DataTypes.STRING,
   },
 };

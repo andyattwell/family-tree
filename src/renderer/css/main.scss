@@ -31,6 +31,18 @@ html {
   height: 100px;
   position: 'fixed';
   z-index: 10;
+  .list-group {
+    border-radius: 0;
+
+    .list-group-item {
+      color-scheme: dark;
+      border-color: #3a3a3a;
+
+      &:hover {
+        background-color: #304748;
+      }
+    }
+  }
 }
 
 #sidebar {

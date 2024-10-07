@@ -1,16 +1,18 @@
 import { Vector2, Vector3 } from 'three';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import { Person } from '../types';
+import FamilyService from '../services/FamilyService';
 
 interface MenuProps {
   item: Person;
   position: Vector2;
   onShow: (item: Person) => void;
-  onAddPerson: (item: Person) => void;
+  onAddPerson: (item: any) => void;
+  ondeletePerson: (item: any) => void;
 }
 
 export default function PersonMenu(props: MenuProps) {
-  const { position, item, onShow, onAddPerson } = props;
+  const { position, item, onShow, onAddPerson, ondeletePerson } = props;
   const width = 200;
   const height = 100;
 
@@ -21,9 +23,21 @@ export default function PersonMenu(props: MenuProps) {
   const handleAddChildren = () => {
     onAddPerson({
       parents: [item],
-      familyID: Number(item.familyID),
+      familyId: Number(item.familyId),
       position: new Vector3(item.position?.x, 0.1, (item.position?.z || 0) + 2),
     });
+  };
+
+  const handleDelete = () => {
+    FamilyService.deletePerson(item.id)
+      .then((response: any) => {
+        ondeletePerson(item);
+        console.log('handleDelete then', response);
+        return response;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -38,26 +52,15 @@ export default function PersonMenu(props: MenuProps) {
         zIndex: 10,
       }}
     >
-      <ListGroup className="bg-dark">
-        <ListGroupItem
-          type="button"
-          className="bg-dark text-white"
-          onClick={handleEdit}
-        >
+      <ListGroup>
+        <ListGroupItem type="button" onClick={handleEdit}>
           Edit
         </ListGroupItem>
-        <ListGroupItem type="button" className="bg-dark text-white">
-          Add Parent
+        <ListGroupItem type="button" onClick={handleAddChildren}>
+          Agregar hijo
         </ListGroupItem>
-        <ListGroupItem
-          type="button"
-          className="bg-dark text-white"
-          onClick={handleAddChildren}
-        >
-          Add Children
-        </ListGroupItem>
-        <ListGroupItem type="button" className="bg-dark text-white">
-          Delete
+        <ListGroupItem type="button" onClick={handleDelete}>
+          Eliminar
         </ListGroupItem>
       </ListGroup>
     </div>

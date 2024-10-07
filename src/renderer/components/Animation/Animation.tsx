@@ -10,7 +10,7 @@ import FamilyService from '../../services/FamilyService';
 
 interface AnimationProps {
   tree: Person[];
-  onContexMenu: (e: any, item: Person) => void;
+  onContexMenu: (e: any, item?: Person) => void;
   updatePositions: (item: Person, position: THREE.Vector3) => void;
 }
 
@@ -21,6 +21,7 @@ function Animation(props: AnimationProps) {
   const { tree, onContexMenu, updatePositions } = props;
   const [dragging, setIsDragging] = useState(false);
   const [objDragging, setObjDragging] = useState<number | boolean>(false);
+  const [backgroundColor, setBackgroundColor] = useState('#892e2e');
   const handleDrag = (
     status: boolean,
     item: Person,
@@ -37,20 +38,21 @@ function Animation(props: AnimationProps) {
   };
 
   return (
-    <Canvas>
+    <Canvas onContextMenu={onContexMenu}>
       <mesh>
         <PerspectiveCamera
           makeDefault
-          zoom={5}
+          zoom={1}
           position={[0, 100, 0]}
           near={0.1}
         />
         <OrbitControls
           enablePan={!dragging}
           enableRotate={false}
-          panSpeed={0.25}
-          minZoom={100}
-          maxZoom={15}
+          panSpeed={0.5}
+          minDistance={20}
+          maxDistance={50}
+          zoomSpeed={1}
           zoomToCursor
         />
         {/* <gridHelper args={[50, 50, `white`, `red`]} /> */}
@@ -68,7 +70,11 @@ function Animation(props: AnimationProps) {
                 <Obj
                   onDrag={handleDrag}
                   objDragging={objDragging}
-                  onContexMenu={onContexMenu}
+                  onContexMenu={(e: any, it: Person) => {
+                    setTimeout(() => {
+                      onContexMenu(e, it);
+                    }, 1);
+                  }}
                   item={item}
                   id={item.id}
                   floorPlane={floorPlane}
@@ -90,7 +96,7 @@ function Animation(props: AnimationProps) {
             args={[planeSize, planeSize]}
             receiveShadow
           />
-          <meshStandardMaterial color="#222" />
+          <meshStandardMaterial color={backgroundColor} />
         </mesh>
       </mesh>
     </Canvas>

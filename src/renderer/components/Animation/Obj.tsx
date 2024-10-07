@@ -166,23 +166,32 @@ function Obj(props: ObjProps) {
         let posZ = item.position.z;
         if (active) {
           event.ray.intersectPlane(floorPlane, planeIntersectPoint);
-          posX = planeIntersectPoint.x;
-          posZ = planeIntersectPoint.z;
-          // const collitions = tree
-          //   .map((person: Person) => checkCollition2(person))
-          //   .filter((collition: any) => collition.isColliding)[0];
-          // if (collitions) {
-          //   // posX += collitions.overX;
-          //   // posZ += collitions.overZ;
-          // }
-          const min = getMinPosition();
-          if (posZ < min) {
-            posZ = min;
+          const nextX = Math.round(planeIntersectPoint.x);
+          const nextZ = Math.round(planeIntersectPoint.z);
+          if (nextX % itemSize <= 0) {
+            posX = (nextX / 2) * itemSize;
           }
-          setPos(new THREE.Vector3(posX, 1, posZ));
-          item.position = pos;
+          if (nextX % itemSize <= 0) {
+            posZ = (nextZ / 2) * itemSize;
+          }
         }
+        // const min = getMinPosition();
+        // if (posZ < min) {
+        //   posZ = min;
+        // }
 
+        if (posX < (offset / 2) * -1) {
+          posX = (offset / 2) * -1;
+        } else if (posX > offset / 2) {
+          posX = offset / 2;
+        }
+        if (posZ < (offset / 2) * -1) {
+          posZ = (offset / 2) * -1;
+        } else if (posZ > offset / 2) {
+          posZ = offset / 2;
+        }
+        item.position = pos;
+        setPos(new THREE.Vector3(posX, 1, posZ));
         onDrag(active, item, pos);
 
         api.start({
@@ -221,7 +230,7 @@ function Obj(props: ObjProps) {
         <meshStandardMaterial color="orange" metalness={2} roughness={5} />
         {/* <meshNormalMaterial attach="material" /> */}
       </animated.mesh>
-      {item.parents ? <Lines item={item} /> : ''}
+      {item.parents ? <Lines item={item} connections={item.parents} /> : ''}
     </mesh>
   );
 }

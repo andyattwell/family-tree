@@ -14,42 +14,65 @@ export default {
   },
   async get(familyID: number) {
     try {
-      const family = (
-        await Family.findOne({
-          where: {
-            id: familyID,
+      const family = await Family.findOne({
+        where: {
+          id: familyID,
+        },
+        include: [
+          {
+            model: Person,
+            as: 'members',
+            include: [
+              {
+                model: Person,
+                as: 'parents',
+              },
+            ],
           },
-        })
-      )?.dataValues;
+        ],
+      });
 
-      const tree = (
-        await Person.findAll({
-          where: {
-            familyID: family.id,
-          },
-        })
-      ).map((person: Person) => {
-        const data = person.dataValues;
+      if (!family) {
+        return {};
+      }
+      const familyData = { ...family.dataValues };
+      familyData.members = family.members.map((person: Person) => {
+        const data = { ...person.dataValues };
+
+        data.parents = person.parents?.map((p: Person) => {
+          const pd = { ...p.dataValues };
+          pd.position = pd.position
+            ? JSON.parse(pd.position)
+            : { x: 0, y: 1, z: 0 };
+          return pd;
+        });
+
         data.position = data.position
           ? JSON.parse(data.position)
           : { x: 0, y: 1, z: 0 };
-        data.parents = data.parents ? data.parents.split(',') : [];
         return data;
       });
 
-      return {
-        ...family,
-        tree,
-      };
+      return familyData;
     } catch (error) {
+      console.log('family Error', error);
       return error;
     }
   },
   async save(data: any) {
     try {
       const family = await Family.create(data);
-      return family;
+      return family.dataValues;
     } catch (error) {
+      return error;
+    }
+  },
+  async detroy(id: number) {
+    try {
+      return await Family.destroy({ where: { id } });
+    } catch (error) {
+      console.warn('Error deleting family');
+      console.log(error);
       return error;
     }
   },

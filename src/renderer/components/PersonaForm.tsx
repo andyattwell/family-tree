@@ -143,9 +143,21 @@ function PersonaForm(props: PersonaFormProps) {
 
   const handleRemoveParent = (parent: Person) => {
     console.log('handleRemoveParent', parent);
-    const d = { ...data };
-    d.parents = data.parents.filter((p: Person) => p.id !== parent.id);
-    setData(d);
+
+    FamilyService.removeParent({
+      personId: data.id,
+      parentId: parent.id,
+    })
+      .then((response) => {
+        const d = { ...data };
+        d.parents = data.parents.filter((p: Person) => p.id !== parent.id);
+        setData(d);
+        onClose(d);
+        return response;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const blobToDataUrl = (blob: Blob) =>
@@ -168,6 +180,23 @@ function PersonaForm(props: PersonaFormProps) {
     onClose(null);
   };
 
+  const handleSaveParents = (parent: Person) => {
+    console.log('handleAddParent', {
+      personId: data.id,
+      parentId: parent.id,
+    });
+    FamilyService.addParent({
+      personId: data.id,
+      parentId: parent.id,
+    })
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const handleSubmit = (e: any) => {
     e.preventDefault();
 
@@ -176,10 +205,20 @@ function PersonaForm(props: PersonaFormProps) {
     d.birthdate = data.birthdate ? new Date(data.birthdate) : null;
     d.dod = data.dod ? new Date(data.dod) : null;
     d.photo = photo;
-    d.parents = data.parents.map((p: Person) => p.id).join(',');
+    d.parents = null;
+    // d.parents = data.parents?.map((p: Person) => {
+    //   return { id: p.id };
+    // });
 
+    console.log('data', d);
     FamilyService.savePerson(d)
-      .then((response) => {
+      .then((response: any) => {
+        data.id = response.id;
+        if (data.parents.length) {
+          data.parents.forEach((parent: Person) => {
+            handleSaveParents(parent);
+          });
+        }
         onClose(response);
         return response;
       })
