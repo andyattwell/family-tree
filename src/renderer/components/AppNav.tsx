@@ -5,9 +5,12 @@ import {
   Nav,
   NavLink,
   Button,
+  Image,
 } from 'react-bootstrap';
 import { Family } from '../types';
 import FamilyService from '../services/FamilyService';
+import AddPersonIcon from '../images/add-person.svg';
+import RemoveFamilyIcon from '../images/group-remove.svg';
 
 interface AppNavProps {
   trees: Family[];
@@ -16,6 +19,7 @@ interface AppNavProps {
   onAddTree: (e: any) => void;
   onAddPerson: (e: any | null) => void;
   onDeleteFamily: () => void;
+  onShowPeople: () => void;
 }
 
 function AppNav(props: AppNavProps) {
@@ -25,6 +29,7 @@ function AppNav(props: AppNavProps) {
     onAddTree,
     onAddPerson,
     onDeleteFamily,
+    onShowPeople,
     family = null,
   } = props;
 
@@ -50,6 +55,9 @@ function AppNav(props: AppNavProps) {
         <Navbar.Brand></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
+          <NavLink onClick={onShowPeople} className="text-white">
+            Personas
+          </NavLink>
           <Nav className="me-auto">
             <NavDropdown
               title={family ? family?.title : 'Familias'}
@@ -64,7 +72,21 @@ function AppNav(props: AppNavProps) {
                         }}
                         key={f.id + f.title}
                       >
-                        {`${f.id} - ${f.title}`}
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            onSelectFamily(f);
+                          }}
+                        >
+                          {`${f.id} - ${f.title}`}
+                        </Button>
+                        <Button
+                          variant="outline-danger"
+                          onClick={handleDeleteFamily}
+                          title="Eliminar familia"
+                        >
+                          <Image src={RemoveFamilyIcon} />
+                        </Button>
                       </NavDropdown.Item>
                     );
                   })
@@ -75,18 +97,23 @@ function AppNav(props: AppNavProps) {
           {family?.id ? (
             <>
               <Nav className="">
-                <NavLink onClick={addPerson} className="bg-success text-white">
-                  Agregar miembro
+                <NavLink
+                  onClick={addPerson}
+                  className="bg-success text-white"
+                  title="Agregar miembro"
+                >
+                  <Image src={AddPersonIcon} />
                 </NavLink>
               </Nav>
-              <Nav className="float-end">
+              {/* <Nav className="float-end">
                 <NavLink
                   onClick={handleDeleteFamily}
                   className="bg-danger text-white"
+                  title="Eliminar familia"
                 >
-                  Eliminar familia
+                  <Image src={RemoveFamilyIcon} />
                 </NavLink>
-              </Nav>
+              </Nav> */}
             </>
           ) : (
             ''

@@ -1,10 +1,22 @@
+import Family from '../Models/Family';
 import Person from '../Models/Person';
 import PersonParents from '../Models/PersonParents';
 
 export default {
   async all() {
     try {
-      return Person.findAll();
+      return (await Person.findAll({
+        include: [{
+          model: Family,
+          as: 'family'
+        }]
+      })).map((person: Person) => {
+        const data = { ...person.dataValues };
+        if (person.family) {
+          data.family = person.family.dataValues;
+        }
+        return data;
+      });
     } catch (error) {
       return error;
     }

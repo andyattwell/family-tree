@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   ButtonGroup,
   FormSelect,
@@ -105,6 +106,7 @@ function PersonaForm(props: PersonaFormProps) {
 
   const [data, setData] = useState<any>({ parents: [] });
   const [photo, setPhoto] = useState<string>(persona?.photo || '');
+  const [errors, setErrors] = useState<any[]>([]);
 
   useEffect(() => {
     let p: any = {
@@ -204,6 +206,15 @@ function PersonaForm(props: PersonaFormProps) {
 
     const d = { ...data };
 
+    if (!d.name) {
+      setErrors([
+        {
+          message: 'El nombre no puede estar vacío',
+        },
+      ]);
+      return false;
+    }
+
     d.birthdate = data.birthdate ? new Date(data.birthdate) : null;
     d.dod = data.dod ? new Date(data.dod) : null;
     d.photo = photo;
@@ -275,6 +286,19 @@ function PersonaForm(props: PersonaFormProps) {
       </div>
 
       <div className="form-group mb-2">
+        <label className="control-label" htmlFor="family">
+          Familia
+        </label>
+        <input
+          className="form-control"
+          disabled
+          name="family"
+          type="text"
+          defaultValue={family.title}
+        />
+      </div>
+
+      <div className="form-group mb-2">
         <label className="control-label" htmlFor="name">
           Nombre
         </label>
@@ -284,6 +308,7 @@ function PersonaForm(props: PersonaFormProps) {
           id="name"
           name="name"
           defaultValue={data.name}
+          required
           onChange={handleInputChange}
         />
       </div>
@@ -400,16 +425,24 @@ function PersonaForm(props: PersonaFormProps) {
           </div>
         </div>
       </div> */}
-
+      {errors.length ? (
+        <Alert variant="danger">
+          <ul>
+            {errors.map((error, i) => {
+              return <li key={error.message}>{error.message}</li>;
+            })}
+          </ul>
+        </Alert>
+      ) : (
+        ''
+      )}
       <div className="form-group">
         <Button onClick={handleSubmit} variant="primary">
           Guardar
         </Button>
-        <ButtonGroup>
-          <Button onClick={handleHide} variant="secondary">
-            Cancelar
-          </Button>
-        </ButtonGroup>
+        <Button onClick={handleHide} variant="secondary" className="float-end">
+          Cancelar
+        </Button>
       </div>
     </form>
   );

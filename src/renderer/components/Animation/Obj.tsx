@@ -223,8 +223,9 @@ function Obj(props: ObjProps) {
 
         <ObjText
           text={item.name || ''}
-          position={new THREE.Vector3(0, 0, itemSize + 0.2)}
-          size={itemSize * 0.4}
+          position={new THREE.Vector3(0, 0, itemSize + 1)}
+          size={itemSize * 0.6}
+          itemSize={itemSize}
         />
         {/* <boxGeometry args={dimentions} /> */}
         <meshStandardMaterial color="orange" metalness={2} roughness={5} />

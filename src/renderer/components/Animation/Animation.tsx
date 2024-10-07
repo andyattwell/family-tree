@@ -66,7 +66,7 @@ function Animation(props: AnimationProps) {
           {tree.map((item: Person) => {
             // const item = tree[id];
             return (
-              <mesh key={item.id}>
+              <mesh key={item.id} castShadow={true}>
                 <Obj
                   onDrag={handleDrag}
                   objDragging={objDragging}

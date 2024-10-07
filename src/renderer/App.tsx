@@ -12,6 +12,7 @@ import PersonMenu from './components/PersonMenu';
 // import MockData from './mock-data';
 import FamilyForm from './components/FamilyForm';
 import FamilyService from './services/FamilyService';
+import PeopleList from './components/PeopleList';
 
 interface AppProps {
   setTree: (tree: any) => void;
@@ -25,6 +26,7 @@ function App(props: AppProps) {
   const [menu, setMenu] = useState<MenuProps | null>(null);
   const [showFamilyForm, setShowFamilyForm] = useState(false);
   const [load, setLoad] = useState(true);
+  const [showPeople, setShowPeople] = useState(false);
 
   // The `state` arg is correctly typed as `RootState` already
 
@@ -128,6 +130,9 @@ function App(props: AppProps) {
           setShowFamilyForm(true);
         }}
         onAddPerson={showPersona}
+        onShowPeople={() => {
+          setShowPeople(true);
+        }}
       />
 
       <div className="main-container">
@@ -168,6 +173,18 @@ function App(props: AppProps) {
         )}
       </div>
 
+      {showPeople ? (
+        <PeopleList
+          show={showPeople}
+          onClose={() => {
+            setShowPeople(false);
+          }}
+          onShowPersona={showPersona}
+          onSelectFamily={selectFamily}
+        />
+      ) : (
+        ''
+      )}
       <FamilyForm
         show={showFamilyForm}
         onClose={(f: any) => {

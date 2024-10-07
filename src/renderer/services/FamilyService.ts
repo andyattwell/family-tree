@@ -1,8 +1,9 @@
 import { ipcRequest } from '../helpers';
-import { Person } from '../types';
-// import { Family } from '../types';
 
 export default {
+  getPeople: async () => {
+    return ipcRequest('people', null);
+  },
   getFamilies: async () => {
     return ipcRequest('families', null);
   },

@@ -23,11 +23,6 @@ export default function FamilyForm(props: Props) {
       .catch((error) => {
         console.log(error);
       });
-
-    // calling IPC exposed from preload script
-    window.electron.ipcRenderer.once('ipc-people-family-response', (arg) => {
-      console.log(arg);
-    });
   };
 
   const handleClose = () => {
