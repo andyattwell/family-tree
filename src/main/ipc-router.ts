@@ -18,7 +18,7 @@ const routes = [
   {
     channel: 'ipc-people-remove-parent',
     callback: PersonController.removeParent,
-  }
+  },
   {
     channel: 'ipc-families-save',
     callback: FamilyController.save,

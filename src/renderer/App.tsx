@@ -9,16 +9,11 @@ import PersonaForm from './components/PersonaForm';
 import Animation from './components/Animation/Animation';
 import { Family, Person, MenuProps } from './types';
 import PersonMenu from './components/PersonMenu';
-// import MockData from './mock-data';
 import FamilyForm from './components/FamilyForm';
 import FamilyService from './services/FamilyService';
 import PeopleList from './components/PeopleList';
 
-interface AppProps {
-  setTree: (tree: any) => void;
-}
-
-function App(props: AppProps) {
+function App() {
   const [trees, setTrees] = useState<Family[]>([]);
   const [family, setFamily] = useState<Family | null>(null);
   const [showSidebar, setShowSidebar] = useState(false);
@@ -100,8 +95,7 @@ function App(props: AppProps) {
     return true;
   };
 
-  const onContexMenu = (e: any, item: Person): void => {
-    console.log('onContexMenu', item);
+  const onContexMenu = (e: any, item?: Person): void => {
     e.nativeEvent.preventDefault();
     if (item && (!menu || menu.item?.id !== item.id)) {
       setMenu({
@@ -111,12 +105,13 @@ function App(props: AppProps) {
     } else {
       setMenu(null);
     }
-    return false;
   };
 
   const onDeletePerson = (item: Person) => {
     setMenu(null);
-    getFamily(item.familyId);
+    if (item.familyId) {
+      getFamily(item.familyId);
+    }
   };
 
   return (
@@ -135,7 +130,7 @@ function App(props: AppProps) {
         }}
       />
 
-      <div className="main-container">
+      <div className={`main-container ${showSidebar ? 'open' : ''}`}>
         <Sidebar onClose={closeSidebar} show={showSidebar}>
           <div className="sidebar-title">
             <h4>{persona?.id ? persona.name : `Agregar a ${family?.title}`}</h4>
@@ -162,15 +157,17 @@ function App(props: AppProps) {
         ) : (
           ''
         )}
-        {family?.members ? (
-          <Animation
-            onContexMenu={onContexMenu}
-            tree={family?.members}
-            updatePositions={updatePositions}
-          />
-        ) : (
-          ''
-        )}
+        <div id="tree-view">
+          {family?.members ? (
+            <Animation
+              onContexMenu={onContexMenu}
+              tree={family?.members}
+              updatePositions={updatePositions}
+            />
+          ) : (
+            ''
+          )}
+        </div>
       </div>
 
       {showPeople ? (

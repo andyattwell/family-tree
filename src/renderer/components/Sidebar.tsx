@@ -8,21 +8,19 @@ interface Props {
 
 function Sidebar({ show, onClose, children }: Props) {
   return (
-    <div>
-      <div id="sidebar" className={show ? 'open' : ''}>
-        <Button
-          type="button"
-          className="sm float-end me-3 mt-2"
-          variant="outline-secondary"
-          onClick={(e) => {
-            onClose();
-            e.preventDefault();
-          }}
-        >
-          &times;
-        </Button>
-        <div className="sidebar-content">{children}</div>
-      </div>
+    <div id="sidebar" className={show ? 'open' : ''}>
+      <Button
+        type="button"
+        className="sm float-end me-3 mt-2"
+        variant="outline-secondary"
+        onClick={(e) => {
+          onClose();
+          e.preventDefault();
+        }}
+      >
+        &times;
+      </Button>
+      <div className="sidebar-content">{children}</div>
     </div>
   );
 }

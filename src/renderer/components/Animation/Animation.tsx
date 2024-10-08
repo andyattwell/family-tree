@@ -21,7 +21,7 @@ function Animation(props: AnimationProps) {
   const { tree, onContexMenu, updatePositions } = props;
   const [dragging, setIsDragging] = useState(false);
   const [objDragging, setObjDragging] = useState<number | boolean>(false);
-  const [backgroundColor, setBackgroundColor] = useState('#892e2e');
+  const [backgroundColor] = useState('#892e2e');
   const handleDrag = (
     status: boolean,
     item: Person,
@@ -64,9 +64,8 @@ function Animation(props: AnimationProps) {
         />
         <mesh>
           {tree.map((item: Person) => {
-            // const item = tree[id];
             return (
-              <mesh key={item.id} castShadow={true}>
+              <mesh key={item.id}>
                 <Obj
                   onDrag={handleDrag}
                   objDragging={objDragging}
@@ -91,11 +90,7 @@ function Animation(props: AnimationProps) {
           position={[0, 0, 0]}
           receiveShadow
         >
-          <planeGeometry
-            attach="geometry"
-            args={[planeSize, planeSize]}
-            receiveShadow
-          />
+          <planeGeometry attach="geometry" args={[planeSize, planeSize]} />
           <meshStandardMaterial color={backgroundColor} />
         </mesh>
       </mesh>
@@ -103,10 +98,4 @@ function Animation(props: AnimationProps) {
   );
 }
 
-const mapStateToProps = (state) => {
-  // const tree = getTree(state);
-  // return { tree };
-};
-
 export default Animation;
-// export default connect(mapStateToProps)(Animation);

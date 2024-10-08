@@ -5,12 +5,16 @@ import PersonParents from '../Models/PersonParents';
 export default {
   async all() {
     try {
-      return (await Person.findAll({
-        include: [{
-          model: Family,
-          as: 'family'
-        }]
-      })).map((person: Person) => {
+      return (
+        await Person.findAll({
+          include: [
+            {
+              model: Family,
+              as: 'family',
+            },
+          ],
+        })
+      ).map((person: any) => {
         const data = { ...person.dataValues };
         if (person.family) {
           data.family = person.family.dataValues;
@@ -22,12 +26,11 @@ export default {
     }
   },
   async save(data: any) {
-    if (data.position) {
-      data.position = JSON.stringify(data.position);
-    }
-    console.log({ data });
     try {
-      let person;
+      let person: any;
+      if (data.position) {
+        data.position = JSON.stringify(data.position);
+      }
       if (data.id) {
         await Person.update(data, {
           where: {
@@ -47,19 +50,22 @@ export default {
         person = await Person.create(data);
       }
 
+      if (!person) {
+        return null;
+      }
       const response = { ...person.dataValues };
 
       response.parents = person.parents?.map((p: Person) => {
-          const pd = { ...p.dataValues };
-          pd.position = pd.position
-            ? JSON.parse(pd.position)
-            : { x: 0, y: 1, z: 0 };
-          return pd;
-        });
-
-        response.position = data.position
-          ? JSON.parse(data.position)
+        const pd = { ...p.dataValues };
+        pd.position = pd.position
+          ? JSON.parse(pd.position)
           : { x: 0, y: 1, z: 0 };
+        return pd;
+      });
+
+      response.position = data.position
+        ? JSON.parse(data.position)
+        : { x: 0, y: 1, z: 0 };
 
       return response;
     } catch (error) {
@@ -98,13 +104,13 @@ export default {
         where: {
           personId,
           parentId,
-        }
+        },
       });
     } catch (error) {
       console.log(error);
       return error;
     }
-  }
+  },
 
   async destroy(id: number) {
     try {
