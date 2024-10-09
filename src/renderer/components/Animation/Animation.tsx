@@ -2,11 +2,15 @@ import { useState } from 'react';
 // import { connect } from 'react-redux';
 import { Canvas, extend } from '@react-three/fiber';
 import * as THREE from 'three';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import {
+  Box,
+  OrbitControls,
+  PerspectiveCamera,
+  Plane,
+} from '@react-three/drei';
 import Obj from './Obj';
 import { Person } from '../../types';
 // import { getTree } from '../../redux/selectors';
-import FamilyService from '../../services/FamilyService';
 
 interface AnimationProps {
   tree: Person[];
@@ -22,6 +26,12 @@ function Animation(props: AnimationProps) {
   const [dragging, setIsDragging] = useState(false);
   const [objDragging, setObjDragging] = useState<number | boolean>(false);
   const [backgroundColor] = useState('#892e2e');
+
+  // const [ambientLightIntensity] = useState(Math.PI / 2);
+  const [ambientLightIntensity] = useState(3);
+  const [pointLightIntensity] = useState(3);
+  const [pointLightPosition] = useState([0, 10, 0]);
+
   const handleDrag = (
     status: boolean,
     item: Person,
@@ -30,7 +40,6 @@ function Animation(props: AnimationProps) {
     setIsDragging(status);
     updatePositions(item, position);
     if (!status) {
-      FamilyService.savePerson({ id: item.id, position });
       setObjDragging(false);
     } else {
       setObjDragging(item.id);
@@ -38,34 +47,48 @@ function Animation(props: AnimationProps) {
   };
 
   return (
-    <Canvas onContextMenu={onContexMenu}>
+    <Canvas onContextMenu={onContexMenu} shadows>
       <mesh>
         <PerspectiveCamera
           makeDefault
-          zoom={1}
           position={[0, 100, 0]}
-          near={0.1}
+          near={1}
+          fov={60}
         />
         <OrbitControls
           enablePan={!dragging}
-          enableRotate={false}
+          enableRotate={!dragging}
           panSpeed={0.5}
           minDistance={20}
-          maxDistance={50}
+          maxDistance={70}
           zoomSpeed={1}
           zoomToCursor
         />
         {/* <gridHelper args={[50, 50, `white`, `red`]} /> */}
-        <ambientLight intensity={Math.PI / 2} />
+        <ambientLight intensity={ambientLightIntensity} />
         <pointLight
-          position={[planeSize / 2, 10, planeSize / 2]}
+          position={pointLightPosition}
           decay={0}
-          intensity={Math.PI}
+          intensity={pointLightIntensity}
+          castShadow
+          position={[0, 30, (planeSize / 2) * -1]}
         />
-        <mesh>
+        {/* <directionalLight
+          intensity={10}
+          decay={0}
+          castShadow
+          shadow-mapSize-height={400}
+          shadow-mapSize-width={400}
+          position={[2.5, 30, 5]}
+          shadow-camera-left={-100}
+          shadow-camera-right={100}
+          shadow-camera-top={200}
+          shadow-camera-bottom={-200}
+        /> */}
+        <group>
           {tree.map((item: Person) => {
             return (
-              <mesh key={item.id}>
+              <group key={item.id}>
                 <Obj
                   onDrag={handleDrag}
                   objDragging={objDragging}
@@ -81,18 +104,18 @@ function Animation(props: AnimationProps) {
                   offset={planeSize}
                   tree={tree}
                 />
-              </mesh>
+              </group>
             );
           })}
-        </mesh>
-        <mesh
+        </group>
+        <Plane
+          receiveShadow
           rotation={[-Math.PI / 2, 0, 0]}
           position={[0, 0, 0]}
-          receiveShadow
+          args={[planeSize, planeSize]}
         >
-          <planeGeometry attach="geometry" args={[planeSize, planeSize]} />
-          <meshStandardMaterial color={backgroundColor} />
-        </mesh>
+          <meshStandardMaterial attach="material" color={backgroundColor} />
+        </Plane>
       </mesh>
     </Canvas>
   );

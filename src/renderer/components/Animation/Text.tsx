@@ -11,7 +11,7 @@ export default function ObjText(props: TextProps) {
   const { text, position, size, itemSize } = props;
   const paragraphs = [text];
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={position}>
+    <group position={position}>
       {paragraphs.map((paragraph) => {
         return (
           <Float rotationIntensity={0.2} floatIntensity={0.5} key={paragraph}>
@@ -21,6 +21,8 @@ export default function ObjText(props: TextProps) {
               anchorY="middle"
               fontSize={size}
               maxWidth={10}
+              position={[0, 0.2, 0]}
+              rotation={[-Math.PI / 2, 0, 0]}
             >
               <meshBasicMaterial color="white" fog={false} />
               {paragraph}
@@ -28,10 +30,10 @@ export default function ObjText(props: TextProps) {
           </Float>
         );
       })}
-      <mesh position={[0, 0, -0.8]}>
+      <mesh position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry attach="geometry" args={[10, itemSize]} />
         <meshStandardMaterial color={'black'} />
       </mesh>
-    </mesh>
+    </group>
   );
 }

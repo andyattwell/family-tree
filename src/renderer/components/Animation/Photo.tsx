@@ -1,19 +1,25 @@
 import * as THREE from 'three';
 import { useLoader } from '@react-three/fiber';
+import { Circle } from '@react-three/drei';
 import logo from '../../images/person2.png';
 
 interface PhotoProps {
   img: string | undefined;
   size: number;
+  position: THREE.Vector3;
 }
 
-export default function Photo({ img, size }: PhotoProps) {
+export default function Photo({ img, size, position }: PhotoProps) {
   const texture = useLoader(THREE.TextureLoader, img || logo);
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.1, 0]}>
-      {/* <planeGeometry attach="geometry" args={[size, size]} /> */}
-      <circleGeometry attach="geometry" args={[size, 24]} />
-      <meshBasicMaterial attach="material" map={texture} />
-    </mesh>
+    <Circle
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={position}
+      castShadow
+      receiveShadow
+      args={[size / 2, 24]}
+    >
+      <meshStandardMaterial attach="material" map={texture} />
+    </Circle>
   );
 }

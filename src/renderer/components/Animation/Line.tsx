@@ -74,10 +74,11 @@ export function PlaneLine({ start, end }: LineProps) {
 interface LinesProps {
   item: Person;
   connections: Person[];
+  itemSize: number;
 }
 
 export function Lines(props: LinesProps) {
-  const { item, connections } = props;
+  const { item, connections, itemSize } = props;
   // const [parents, setParents] = useState<Person[]>([]);
 
   // useEffect(() => {
@@ -88,8 +89,8 @@ export function Lines(props: LinesProps) {
   //   }
   // }, [item]);
 
-  const itemZ = (item.position?.z || 0) - 1.5;
-  const y = 0.5;
+  const itemZ = item.position?.z || 0;
+  const y = 0.1;
   return connections.map((conPerson: Person) => {
     const key = (item.id || 0) + (conPerson.id || 0);
 
@@ -109,15 +110,15 @@ export function Lines(props: LinesProps) {
         /> */}
         <Line
           start={[item.position.x, y, itemZ]}
-          end={[item.position.x, y, conPerson.position.z + 2]}
+          end={[item.position.x, y, conPerson.position.z + 3]}
         />
         <Line
-          start={[item.position.x, y, conPerson.position.z + 2]}
-          end={[conPerson.position.x, y, conPerson.position.z + 2]}
+          start={[item.position.x, y, conPerson.position.z + 3]}
+          end={[conPerson.position.x, y, conPerson.position.z + 3]}
         />
         <Line
           start={[conPerson.position.x, y, conPerson.position.z + 1]}
-          end={[conPerson.position.x, y, conPerson.position.z + 2]}
+          end={[conPerson.position.x, y, conPerson.position.z + 3]}
         />
       </mesh>
     );

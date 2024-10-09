@@ -88,6 +88,11 @@ const configuration: webpack.Configuration = {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset/resource',
       },
+      // Models
+      {
+        test: /\.(glb|gltf|bin|obj|mtl)$/i,
+        type: 'asset/resource',
+      },
       // Images
       {
         test: /\.(png|jpg|jpeg|gif)$/i,
