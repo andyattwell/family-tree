@@ -21,12 +21,10 @@ function App() {
   const [menu, setMenu] = useState<MenuProps | null>(null);
   const [showFamilyForm, setShowFamilyForm] = useState(false);
   const [load, setLoad] = useState(true);
-  const [showPeople, setShowPeople] = useState(false);
 
   // The `state` arg is correctly typed as `RootState` already
 
   const getFamilies = useCallback(() => {
-    console.log('getFamilies');
     FamilyService.getFamilies()
       .then((response: any) => {
         setTrees(response);
@@ -41,7 +39,6 @@ function App() {
   }
 
   const getFamily = useCallback((familyId: number) => {
-    console.log('getFamily');
     FamilyService.getFamily(familyId)
       .then((response: any) => {
         console.log({ response });
@@ -126,26 +123,18 @@ function App() {
         }}
         onAddPerson={showPersona}
         onShowPeople={() => {
-          setShowPeople(true);
+          setShowSidebar(true);
         }}
       />
 
       <div className={`main-container ${showSidebar ? 'open' : ''}`}>
-        <Sidebar onClose={closeSidebar} show={showSidebar}>
-          <div className="sidebar-title">
-            <h4>{persona?.id ? persona.name : `Agregar a ${family?.title}`}</h4>
-          </div>
-          {persona ? (
-            <PersonaForm
-              family={family}
-              persona={persona}
-              onClose={closeSidebar}
-              tree={family?.members || []}
-            />
-          ) : (
-            ''
-          )}
-        </Sidebar>
+        <Sidebar
+          onClose={closeSidebar}
+          show={showSidebar}
+          onSelectFamily={selectFamily}
+          persona={persona}
+          family={family}
+        />
         {menu ? (
           <PersonMenu
             item={menu.item}
@@ -170,18 +159,6 @@ function App() {
         </div>
       </div>
 
-      {showPeople ? (
-        <PeopleList
-          show={showPeople}
-          onClose={() => {
-            setShowPeople(false);
-          }}
-          onShowPersona={showPersona}
-          onSelectFamily={selectFamily}
-        />
-      ) : (
-        ''
-      )}
       <FamilyForm
         show={showFamilyForm}
         onClose={(f: any) => {

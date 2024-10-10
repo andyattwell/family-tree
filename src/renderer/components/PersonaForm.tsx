@@ -286,19 +286,6 @@ function PersonaForm(props: PersonaFormProps) {
       </div>
 
       <div className="form-group mb-2">
-        <label className="control-label" htmlFor="family">
-          Familia
-        </label>
-        <input
-          className="form-control"
-          disabled
-          name="family"
-          type="text"
-          defaultValue={family.title}
-        />
-      </div>
-
-      <div className="form-group mb-2">
         <label className="control-label" htmlFor="name">
           Nombre
         </label>
@@ -310,6 +297,19 @@ function PersonaForm(props: PersonaFormProps) {
           defaultValue={data.name}
           required
           onChange={handleInputChange}
+        />
+      </div>
+
+      <div className="form-group mb-2">
+        <label className="control-label" htmlFor="family">
+          Familia
+        </label>
+        <input
+          className="form-control"
+          disabled
+          name="family"
+          type="text"
+          defaultValue={data.family?.title}
         />
       </div>
 

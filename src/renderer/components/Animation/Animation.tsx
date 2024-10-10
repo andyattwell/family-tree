@@ -20,12 +20,12 @@ interface AnimationProps {
 
 function Animation(props: AnimationProps) {
   extend(THREE);
-  const planeSize = 100;
+  const planeSize = 200;
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const { tree, onContexMenu, updatePositions } = props;
   const [dragging, setIsDragging] = useState(false);
   const [objDragging, setObjDragging] = useState<number | boolean>(false);
-  const [backgroundColor] = useState('#892e2e');
+  const [backgroundColor] = useState('#0f601a');
 
   // const [ambientLightIntensity] = useState(Math.PI / 2);
   const [ambientLightIntensity] = useState(3);
@@ -61,6 +61,8 @@ function Animation(props: AnimationProps) {
           panSpeed={0.5}
           minDistance={20}
           maxDistance={70}
+          minPolarAngle={-Math.PI}
+          maxPolarAngle={Math.PI / 4}
           zoomSpeed={1}
           zoomToCursor
         />
@@ -73,18 +75,6 @@ function Animation(props: AnimationProps) {
           castShadow
           position={[0, 30, (planeSize / 2) * -1]}
         />
-        {/* <directionalLight
-          intensity={10}
-          decay={0}
-          castShadow
-          shadow-mapSize-height={400}
-          shadow-mapSize-width={400}
-          position={[2.5, 30, 5]}
-          shadow-camera-left={-100}
-          shadow-camera-right={100}
-          shadow-camera-top={200}
-          shadow-camera-bottom={-200}
-        /> */}
         <group>
           {tree.map((item: Person) => {
             return (

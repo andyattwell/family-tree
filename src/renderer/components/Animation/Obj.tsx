@@ -95,14 +95,8 @@ function Obj(props: ObjProps) {
         let isColliding = false;
         if (active) {
           event.ray.intersectPlane(floorPlane, planeIntersectPoint);
-          const nextX = Math.round(planeIntersectPoint.x);
-          const nextZ = Math.round(planeIntersectPoint.z);
-          if (nextX % itemSize <= 0) {
-            posX = nextX;
-          }
-          if (nextZ % itemSize <= 0) {
-            posZ = nextZ;
-          }
+          posX = Math.round(planeIntersectPoint.x);
+          posZ = Math.round(planeIntersectPoint.z);
 
           if (posX < (offset / 2) * -1) {
             posX = (offset / 2) * -1;
@@ -134,8 +128,8 @@ function Obj(props: ObjProps) {
         if (!isColliding) {
           item.position = nextPos;
           setPos(nextPos);
+          onDrag(active, item, pos);
         }
-        onDrag(active, item, pos);
 
         api.start({
           position: pos,
