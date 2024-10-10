@@ -52,7 +52,10 @@ Person.belongsToMany(Person, {
   try {
     // await Person.sync();
     // await Person.sync({ force: true });
-    // const family = await Family.create({ title: 'Test family' });
+    // const family = await Family.create({
+    //   title: 'Test family',
+    //   backgroundColor: '#ffd60a',
+    // });
     // const person1 = await Person.create({
     //   name: 'Person 1',
     //   familyId: family.dataValues.id,

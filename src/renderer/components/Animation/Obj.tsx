@@ -17,10 +17,10 @@ import FamilyService from '../../services/FamilyService';
 interface ObjProps {
   onDrag: (status: boolean, item: Person, pos: THREE.Vector3) => void;
   onContexMenu: (e: any, item: Person) => void;
-  floorPlane: THREE.Plane;
   item: Person;
   id: number;
-  offset: number;
+  offsetX: number;
+  offsetY: number;
   tree: Person[];
   objDragging: number | boolean;
   // updatePositions: (
@@ -35,12 +35,12 @@ interface ObjProps {
 function Obj(props: ObjProps) {
   const itemSize = 5;
   const posY = 1;
-  const { onDrag, onContexMenu, floorPlane, item, offset, tree, objDragging } =
+  const { onDrag, onContexMenu, item, offsetX, offsetY, tree, objDragging } =
     props;
   const [pos, setPos] = useState(
     new THREE.Vector3(item.position.x, posY, item.position.z),
   );
-
+  const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersectPoint = new THREE.Vector3();
   const [spring, api] = useSpring(
     () => ({
@@ -71,7 +71,7 @@ function Obj(props: ObjProps) {
   };
 
   const getMinPosition = () => {
-    let min = -offset;
+    let min = -offsetY;
     if (item.parents) {
       item.parents.forEach((p) => {
         const relativeZ = (p.position?.z || 0) + itemSize * 2;
@@ -98,15 +98,15 @@ function Obj(props: ObjProps) {
           posX = Math.round(planeIntersectPoint.x);
           posZ = Math.round(planeIntersectPoint.z);
 
-          if (posX < (offset / 2) * -1) {
-            posX = (offset / 2) * -1;
-          } else if (posX > offset / 2) {
-            posX = offset / 2;
+          if (posX < (offsetX / 2) * -1) {
+            posX = (offsetX / 2) * -1;
+          } else if (posX > offsetX / 2) {
+            posX = offsetX / 2;
           }
-          if (posZ < (offset / 2) * -1) {
-            posZ = (offset / 2) * -1;
-          } else if (posZ > offset / 2) {
-            posZ = offset / 2;
+          if (posZ < (offsetY / 2) * -1) {
+            posZ = (offsetY / 2) * -1;
+          } else if (posZ > offsetY / 2) {
+            posZ = offsetY / 2;
           }
           nextPos = new THREE.Vector3(posX, posY, posZ);
 
@@ -138,8 +138,6 @@ function Obj(props: ObjProps) {
         console.log('ERROR', error);
         onDrag(false, item, pos);
       }
-
-      return timeStamp;
     },
     { delay: true },
   );
@@ -151,17 +149,16 @@ function Obj(props: ObjProps) {
 
     return () => clearTimeout(saveData);
   }, [pos]);
-  const handleContexMenu = (e) => {
-    onContexMenu(e, item);
-  };
-  const boxRef = useRef();
+
   return (
     <group>
       <animated.mesh
         {...spring}
         {...bind()}
         castShadow
-        onContextMenu={handleContexMenu}
+        onContextMenu={(e) => {
+          onContexMenu(e, item);
+        }}
       >
         <Photo img={item.photo} size={3.5} position={[0, 0.2, -0.5]} />
         <Crest />

@@ -151,6 +151,7 @@ function App() {
             <Animation
               onContexMenu={onContexMenu}
               tree={family?.members}
+              family={family}
               updatePositions={updatePositions}
             />
           ) : (

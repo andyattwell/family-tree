@@ -22,9 +22,10 @@ export default {
     type: DataTypes.TEXT,
   },
   photo: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
+    length: 'long',
   },
   position: {
-    type: DataTypes.TEXT,
+    type: DataTypes.STRING,
   },
 };

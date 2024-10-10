@@ -21,6 +21,11 @@ export interface Family {
   id: number;
   title: string;
   members: Person[];
+  photo?: string;
+  backgroundImage?: string;
+  backgroundColor?: string;
+  backgroundSize?: string;
+  backgroundPosition?: THREE.Vector3;
 }
 
 export interface LineProps {

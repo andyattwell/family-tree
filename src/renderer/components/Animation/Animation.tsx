@@ -1,36 +1,30 @@
 import { useState } from 'react';
-// import { connect } from 'react-redux';
 import { Canvas, extend } from '@react-three/fiber';
 import * as THREE from 'three';
-import {
-  Box,
-  OrbitControls,
-  PerspectiveCamera,
-  Plane,
-} from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import Obj from './Obj';
-import { Person } from '../../types';
-// import { getTree } from '../../redux/selectors';
+import { Family, Person } from '../../types';
+import Background from './Background';
 
 interface AnimationProps {
   tree: Person[];
+  family: Family;
   onContexMenu: (e: any, item?: Person) => void;
   updatePositions: (item: Person, position: THREE.Vector3) => void;
 }
 
 function Animation(props: AnimationProps) {
   extend(THREE);
-  const planeSize = 200;
-  const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-  const { tree, onContexMenu, updatePositions } = props;
+  const { tree, onContexMenu, updatePositions, family } = props;
+  const [planeSizeWidth, setPlaneSizeWidth] = useState(100);
+  const [planeSizeHeight, setPlaneSizeHeight] = useState(100);
   const [dragging, setIsDragging] = useState(false);
   const [objDragging, setObjDragging] = useState<number | boolean>(false);
-  const [backgroundColor] = useState('#0f601a');
 
   // const [ambientLightIntensity] = useState(Math.PI / 2);
   const [ambientLightIntensity] = useState(3);
   const [pointLightIntensity] = useState(3);
-  const [pointLightPosition] = useState([0, 10, 0]);
+  const [pointLightPosition] = useState([0, 30, (planeSizeWidth / 2) * -1]);
 
   const handleDrag = (
     status: boolean,
@@ -46,6 +40,21 @@ function Animation(props: AnimationProps) {
     }
   };
 
+  const handleBackgroundSizeChange = (width: number, height: number) => {
+    let collition = false;
+    tree.forEach((p: Person) => {
+      if (p.position.x < -width / 2 || p.position.x > width / 2) {
+        collition = true;
+      } else if (p.position.z < -height / 2 || p.position.z > height / 2) {
+        collition = true;
+      }
+    });
+    if (!collition) {
+      setPlaneSizeWidth(width);
+      setPlaneSizeHeight(height);
+    }
+  };
+
   return (
     <Canvas onContextMenu={onContexMenu} shadows>
       <mesh>
@@ -56,11 +65,13 @@ function Animation(props: AnimationProps) {
           fov={60}
         />
         <OrbitControls
+          // enablePan={!dragging}
           enablePan={!dragging}
-          enableRotate={!dragging}
+          enableRotate={false}
+          // enableRotate={!dragging}
           panSpeed={0.5}
           minDistance={20}
-          maxDistance={70}
+          maxDistance={200}
           minPolarAngle={-Math.PI}
           maxPolarAngle={Math.PI / 4}
           zoomSpeed={1}
@@ -73,7 +84,6 @@ function Animation(props: AnimationProps) {
           decay={0}
           intensity={pointLightIntensity}
           castShadow
-          position={[0, 30, (planeSize / 2) * -1]}
         />
         <group>
           {tree.map((item: Person) => {
@@ -89,23 +99,22 @@ function Animation(props: AnimationProps) {
                   }}
                   item={item}
                   id={item.id}
-                  floorPlane={floorPlane}
                   key={item.id}
-                  offset={planeSize}
+                  offsetX={planeSizeWidth}
+                  offsetY={planeSizeHeight}
                   tree={tree}
                 />
               </group>
             );
           })}
         </group>
-        <Plane
-          receiveShadow
-          rotation={[-Math.PI / 2, 0, 0]}
-          position={[0, 0, 0]}
-          args={[planeSize, planeSize]}
-        >
-          <meshStandardMaterial attach="material" color={backgroundColor} />
-        </Plane>
+
+        <Background
+          color={family?.backgroundColor || '#0f601a'}
+          width={planeSizeWidth}
+          height={planeSizeHeight}
+          onSizeChange={handleBackgroundSizeChange}
+        />
       </mesh>
     </Canvas>
   );
