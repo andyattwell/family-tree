@@ -1,21 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Canvas, extend } from '@react-three/fiber';
 import * as THREE from 'three';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import Obj from './Obj';
 import { Family, Person } from '../../types';
 import Background from './Background';
+import FamilyService from '../../services/FamilyService';
 
 interface AnimationProps {
   tree: Person[];
   family: Family;
   onContexMenu: (e: any, item?: Person) => void;
   updatePositions: (item: Person, position: THREE.Vector3) => void;
+  onUpdateFamily: (family: Family) => void;
 }
 
 function Animation(props: AnimationProps) {
   extend(THREE);
-  const { tree, onContexMenu, updatePositions, family } = props;
+  const { tree, onContexMenu, updatePositions, family, onUpdateFamily } = props;
   const [planeSizeWidth, setPlaneSizeWidth] = useState(100);
   const [planeSizeHeight, setPlaneSizeHeight] = useState(100);
   const [dragging, setIsDragging] = useState(false);
@@ -25,6 +27,8 @@ function Animation(props: AnimationProps) {
   const [ambientLightIntensity] = useState(3);
   const [pointLightIntensity] = useState(3);
   const [pointLightPosition] = useState([0, 30, (planeSizeWidth / 2) * -1]);
+
+  const [bgModified, setBgModified] = useState(false);
 
   const handleDrag = (
     status: boolean,
@@ -41,19 +45,51 @@ function Animation(props: AnimationProps) {
   };
 
   const handleBackgroundSizeChange = (width: number, height: number) => {
-    let collition = false;
+    let collitionX = false;
+    let collitionY = false;
     tree.forEach((p: Person) => {
       if (p.position.x < -width / 2 || p.position.x > width / 2) {
-        collition = true;
-      } else if (p.position.z < -height / 2 || p.position.z > height / 2) {
-        collition = true;
+        collitionX = true;
+      }
+      if (p.position.z < -height / 2 || p.position.z > height / 2) {
+        collitionY = true;
       }
     });
-    if (!collition) {
+    setBgModified(true);
+    if (!collitionX) {
       setPlaneSizeWidth(width);
+    }
+    if (!collitionY) {
       setPlaneSizeHeight(height);
     }
   };
+
+  useEffect(() => {
+    setBgModified(false);
+    setPlaneSizeWidth(family.backgroundSize?.width || 100);
+    setPlaneSizeHeight(family.backgroundSize?.height || 100);
+  }, [family]);
+
+  useEffect(() => {
+    const saveData = setTimeout(() => {
+      if (!bgModified) {
+        return;
+      }
+      FamilyService.updateFamily({
+        id: family.id,
+        backgroundSize: { width: planeSizeWidth, height: planeSizeHeight },
+      })
+        .then((response: any) => {
+          onUpdateFamily(response);
+          return response;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }, 300);
+
+    return () => clearTimeout(saveData);
+  }, [planeSizeWidth, planeSizeHeight]);
 
   return (
     <Canvas onContextMenu={onContexMenu} shadows>
@@ -110,7 +146,7 @@ function Animation(props: AnimationProps) {
         </group>
 
         <Background
-          color={family?.backgroundColor || '#0f601a'}
+          color={family.backgroundColor}
           width={planeSizeWidth}
           height={planeSizeHeight}
           onSizeChange={handleBackgroundSizeChange}

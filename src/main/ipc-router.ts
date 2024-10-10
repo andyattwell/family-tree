@@ -39,6 +39,10 @@ const routes = [
     channel: 'ipc-family-delete',
     callback: FamilyController.detroy,
   },
+  {
+    channel: 'ipc-family-update',
+    callback: FamilyController.update,
+  },
 ];
 
 routes.forEach((route) => {

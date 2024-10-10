@@ -21,7 +21,9 @@ export type Channels =
   | 'ipc-family'
   | 'ipc-family-response'
   | 'ipc-family-delete'
-  | 'ipc-family-delete-response';
+  | 'ipc-family-delete-response'
+  | 'ipc-family-update'
+  | 'ipc-family-update-response';
 
 const electronHandler = {
   ipcRenderer: {

@@ -48,7 +48,8 @@ function App() {
       .catch(() => {});
   }, []);
 
-  const selectFamily = (f: Family) => {
+  const selectFamily = (f: Family, who?: string) => {
+    console.log('selectFamily', who);
     getFamily(f.id);
   };
 
@@ -153,6 +154,7 @@ function App() {
               tree={family?.members}
               family={family}
               updatePositions={updatePositions}
+              onUpdateFamily={setFamily}
             />
           ) : (
             ''

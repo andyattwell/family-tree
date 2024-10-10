@@ -3,6 +3,7 @@ import { Plane } from '@react-three/drei';
 import { useDrag } from '@use-gesture/react';
 import { useEffect, useState } from 'react';
 import { Vector3 } from 'three';
+import * as THREE from 'three';
 
 interface CornerProps {
   position: Vector3;
@@ -14,15 +15,15 @@ interface CornerProps {
 function Corner(props: CornerProps) {
   const { position, onSizeChange, invertX, invertY } = props;
   const [spring, api] = useSpring(() => ({ position }), [position]);
-
+  const floorPlane = new THREE.Plane(new Vector3(0, 1, 0), 0);
+  const planeIntersectPoint = new Vector3();
   const bind = useDrag(
-    ({ active, movement: [x, y] }) => {
+    ({ active, movement: [x, y], event }) => {
       try {
         if (active) {
-          let posX = Math.round(x) * 0.01;
-          let posZ = Math.round(y) * 0.01;
-          posX *= invertX ? -1 : 1;
-          posZ *= invertY ? -1 : 1;
+          event.ray.intersectPlane(floorPlane, planeIntersectPoint);
+          const posX = Math.round(Math.abs(planeIntersectPoint.x)) * 2;
+          const posZ = Math.round(Math.abs(planeIntersectPoint.z)) * 2;
           onSizeChange(posX, posZ);
         }
         api.start({ position });
@@ -48,7 +49,7 @@ function Corner(props: CornerProps) {
 }
 
 interface BackgroundProps {
-  color: string;
+  color: string | undefined;
   width: number;
   height: number;
   onSizeChange: (width: number, height: number) => void;
@@ -56,7 +57,7 @@ interface BackgroundProps {
 
 function Background(props: BackgroundProps) {
   const { color, width, height, onSizeChange } = props;
-  const [backgroundColor] = useState(color);
+  const [backgroundColor, setBackgroundColor] = useState('#ffd60a');
   // const [planeWidth, setPlaneWidth] = useState(width);
   // const [planeHeight, setPlaneHeight] = useState(height);
   const [corners, setCorners] = useState<any>([]);
@@ -90,20 +91,20 @@ function Background(props: BackgroundProps) {
     ]);
   }, [width, height]);
 
-  const minWidth = 10;
-  const minHeight = 10;
+  useEffect(() => {
+    setBackgroundColor(color || '#ffd60a');
+  }, [color]);
+
+  const minWidth = 60;
+  const maxWidth = 400;
+  const minHeight = 60;
+  const maxHeight = 400;
 
   const handleSizeChange = (x: number, z: number) => {
     let nextWidth = width;
     let nextHeight = height;
-    if (width + x > minWidth) {
-      nextWidth += x;
-    }
-    if (height + z > minHeight) {
-      nextHeight += z;
-    }
-    // setPlaneWidth(nextWidth);
-    // setPlaneHeight(nextHeight);
+    nextWidth = Math.min(Math.max(x, minWidth), maxWidth);
+    nextHeight = Math.min(Math.max(z, minHeight), maxHeight);
     onSizeChange(nextWidth, nextHeight);
   };
 

@@ -1,22 +1,40 @@
-import { useRef } from 'react';
-import { Modal, Button, Form, FormGroup, FormLabel } from 'react-bootstrap';
+import { useEffect, useRef, useState } from 'react';
+import { Button, Form, FormGroup, FormLabel } from 'react-bootstrap';
 import FamilyService from '../services/FamilyService';
+import { Family } from '../types';
 
 interface Props {
-  show: boolean;
-  onClose: (family: any) => void;
+  family: Family;
+  onClose: (family: Family) => void;
 }
 
 export default function FamilyForm(props: Props) {
-  const { show, onClose } = props;
-  const name = useRef();
+  const { onClose, family } = props;
+  const [data, setData] = useState<any>({});
+
+  useEffect(() => {
+    setData({ ...family });
+  }, [family]);
+
+  const handleInputChange = (e: any) => {
+    const { target } = e;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const { name } = target;
+    const arr = data;
+    arr[name] = value;
+    setData(arr);
+  };
+
   const handleSubmit = () => {
-    if (!name.current) {
+    if (!data.title || data.title === '') {
       return;
     }
-    console.log('handleSubmit', name.current.value);
-    FamilyService.addFamily(name.current.value)
-      .then((response) => {
+
+    console.log({ data });
+    FamilyService.updateFamily(data)
+      .then((response: any) => {
+        console.log({ response });
+
         onClose(response);
         return response;
       })
@@ -30,33 +48,37 @@ export default function FamilyForm(props: Props) {
   };
 
   return (
-    <div
-      className={`modal text-white ${show ? 'show' : ''}`}
-      style={{ display: show ? 'block' : 'none' }}
-    >
-      <Modal.Dialog data-bs-theme="dark">
-        <Modal.Header closeButton>
-          <Modal.Title>Crear familia</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <FormGroup>
-              <FormLabel>
-                Nomber:
-                <input type="text" name="name" className="ms-3" ref={name} />
-              </FormLabel>
-            </FormGroup>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={handleSubmit} variant="primary">
-            Guardar
-          </Button>
-          <Button onClick={handleClose} variant="secondary">
-            Cancelar
-          </Button>
-        </Modal.Footer>
-      </Modal.Dialog>
-    </div>
+    <Form>
+      <FormGroup>
+        <FormLabel>
+          Nombre:
+          <input
+            type="text"
+            name="name"
+            className="ms-3"
+            defaultValue={data.title}
+            onChange={handleInputChange}
+          />
+        </FormLabel>
+      </FormGroup>
+      <FormGroup>
+        <FormLabel>
+          Color de fodo:
+          <input
+            type="text"
+            name="backgroundColor"
+            className="ms-3"
+            defaultValue={data.backgroundColor}
+            onChange={handleInputChange}
+          />
+        </FormLabel>
+      </FormGroup>
+      <Button onClick={handleSubmit} variant="primary">
+        Guardar
+      </Button>
+      <Button onClick={handleClose} variant="secondary" className="float-end">
+        Cancelar
+      </Button>
+    </Form>
   );
 }

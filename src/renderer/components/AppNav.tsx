@@ -66,16 +66,11 @@ function AppNav(props: AppNavProps) {
               {trees && trees.length
                 ? trees.map((f) => {
                     return (
-                      <NavDropdown.Item
-                        onClick={() => {
-                          onSelectFamily(f);
-                        }}
-                        key={f.id + f.title}
-                      >
+                      <NavDropdown.Item key={f.id + f.title}>
                         <Button
                           variant="outline"
                           onClick={() => {
-                            onSelectFamily(f);
+                            onSelectFamily(f, 'navbar');
                           }}
                         >
                           {`${f.id} - ${f.title}`}

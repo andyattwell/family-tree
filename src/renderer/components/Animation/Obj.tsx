@@ -40,6 +40,7 @@ function Obj(props: ObjProps) {
   const [pos, setPos] = useState(
     new THREE.Vector3(item.position.x, posY, item.position.z),
   );
+  const [isActive, setIsActive] = useState(false);
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersectPoint = new THREE.Vector3();
   const [spring, api] = useSpring(
@@ -94,6 +95,7 @@ function Obj(props: ObjProps) {
         let nextPos = new THREE.Vector3(posX, posY, posZ);
         let isColliding = false;
         if (active) {
+          setIsActive(active);
           event.ray.intersectPlane(floorPlane, planeIntersectPoint);
           posX = Math.round(planeIntersectPoint.x);
           posZ = Math.round(planeIntersectPoint.z);
@@ -130,7 +132,6 @@ function Obj(props: ObjProps) {
           setPos(nextPos);
           onDrag(active, item, pos);
         }
-
         api.start({
           position: pos,
         });
@@ -144,11 +145,15 @@ function Obj(props: ObjProps) {
 
   useEffect(() => {
     const saveData = setTimeout(() => {
-      FamilyService.savePerson({ id: item.id, pos });
-    }, 1000);
+      if (!isActive) {
+        return;
+      }
+      FamilyService.savePerson({ id: item.id, position: pos });
+      setIsActive(false);
+    }, 300);
 
     return () => clearTimeout(saveData);
-  }, [pos]);
+  }, [pos, isActive]);
 
   return (
     <group>

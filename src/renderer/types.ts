@@ -24,7 +24,10 @@ export interface Family {
   photo?: string;
   backgroundImage?: string;
   backgroundColor?: string;
-  backgroundSize?: string;
+  backgroundSize?: {
+    width: number;
+    height: number;
+  };
   backgroundPosition?: THREE.Vector3;
 }
 
