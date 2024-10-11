@@ -90,7 +90,7 @@ export function Lines(props: LinesProps) {
   // }, [item]);
 
   const itemZ = item.position?.z || 0;
-  const y = 0.1;
+  const y = 1.1;
   return connections.map((conPerson: Person) => {
     const key = (item.id || 0) + (conPerson.id || 0);
 

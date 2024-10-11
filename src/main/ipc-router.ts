@@ -51,7 +51,7 @@ routes.forEach((route) => {
     const responseChannel = `${route.channel}-response`;
     try {
       const response = await route.callback(arg);
-      console.log(`CHANNEL ${responseChannel}`, response);
+      console.log(`CHANNEL ${responseChannel}`);
       event.reply(responseChannel, response);
     } catch (error) {
       event.reply(responseChannel, error);

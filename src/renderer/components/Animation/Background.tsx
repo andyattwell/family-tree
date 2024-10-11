@@ -48,48 +48,103 @@ function Corner(props: CornerProps) {
   );
 }
 
+interface BackgroundDragProps {
+  position: Vector3;
+  onPositionChange: (x: number, z: number) => void;
+}
+function BackgroundDrag(props: BackgroundDragProps) {
+  const { position, onPositionChange } = props;
+  const [spring, api] = useSpring(() => ({ position }), [position]);
+  const floorPlane = new THREE.Plane(new Vector3(0, 1, 0), 0);
+  const planeIntersectPoint = new Vector3();
+  const bind = useDrag(
+    ({ active, movement: [x, y], event }) => {
+      try {
+        if (active) {
+          event.ray.intersectPlane(floorPlane, planeIntersectPoint);
+          const posX = Math.round(planeIntersectPoint.x);
+          const posZ = Math.round(planeIntersectPoint.z);
+          onPositionChange(posX, posZ);
+        }
+        api.start({ position });
+      } catch (error) {
+        console.log('ERROR', error);
+      }
+    },
+    { delay: true },
+  );
+
+  return (
+    <animated.mesh {...spring} {...bind()} castShadow>
+      <Plane rotation={[-Math.PI / 2, 0, 0]} args={[4, 2]}>
+        <meshStandardMaterial attach="material" color="red" />
+      </Plane>
+    </animated.mesh>
+  );
+}
+
 interface BackgroundProps {
   color: string | undefined;
   width: number;
   height: number;
+  position: Vector3;
   onSizeChange: (width: number, height: number) => void;
+  onPositionChange: (x: number, z: number) => void;
 }
 
 function Background(props: BackgroundProps) {
-  const { color, width, height, onSizeChange } = props;
+  const { color, width, height, position, onSizeChange, onPositionChange } =
+    props;
   const [backgroundColor, setBackgroundColor] = useState('#ffd60a');
-  // const [planeWidth, setPlaneWidth] = useState(width);
-  // const [planeHeight, setPlaneHeight] = useState(height);
   const [corners, setCorners] = useState<any>([]);
 
   useEffect(() => {
+    const halfWidth = -width / 2;
+    const halfHeight = -height / 2;
+    const posY = position.y + 0.3;
     setCorners([
       {
-        name: 'UpLeft',
-        position: new Vector3(-width / 2 + 2, 0.3, -height / 2 + 2),
+        name: 'DownLeft',
+        position: new Vector3(
+          position.x - halfWidth - 2,
+          posY,
+          position.z - halfHeight - 2,
+        ),
         invertX: true,
         invertY: true,
       },
       {
-        name: 'DownLeft',
-        position: new Vector3(-width / 2 + 2, 0.3, height / 2 - 2),
+        name: 'UpLeft',
+        position: new Vector3(
+          position.x - halfWidth - 2,
+          posY,
+          position.z + halfHeight + 2,
+        ),
         invertX: true,
-        invertY: false,
-      },
-      {
-        name: 'DownRight',
-        position: new Vector3(width / 2 - 2, 0.3, height / 2 - 2),
-        invertX: false,
         invertY: false,
       },
       {
         name: 'UpRight',
-        position: new Vector3(width / 2 - 2, 0.3, -height / 2 + 2),
+        position: new Vector3(
+          position.x + halfWidth + 2,
+          posY,
+          position.z + halfHeight + 2,
+        ),
+        invertX: false,
+        invertY: false,
+      },
+      {
+        name: 'DownRight',
+        position: new Vector3(
+          position.x + halfWidth + 2,
+          posY,
+          position.z - halfHeight - 2,
+        ),
         invertX: false,
         invertY: true,
       },
     ]);
-  }, [width, height]);
+  }, [width, height, position]);
 
   useEffect(() => {
     setBackgroundColor(color || '#ffd60a');
@@ -108,8 +163,18 @@ function Background(props: BackgroundProps) {
     onSizeChange(nextWidth, nextHeight);
   };
 
+  const handlePositionChange = (x: number, z: number) => {
+    onPositionChange(x, z);
+  };
+
   return (
     <group>
+      <BackgroundDrag
+        position={
+          new Vector3(position.x, position.y + 0.5, position.z - height / 2)
+        }
+        onPositionChange={handlePositionChange}
+      />
       {corners.map((corner: any) => {
         return (
           <group key={corner.name}>
@@ -127,7 +192,7 @@ function Background(props: BackgroundProps) {
       <Plane
         receiveShadow
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, 0, 0]}
+        position={position}
         args={[width, height]}
       >
         <meshStandardMaterial attach="material" color={backgroundColor} />

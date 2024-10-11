@@ -76,6 +76,17 @@ export default {
           height: 100,
         };
       }
+      if (familyData.backgroundPosition) {
+        familyData.backgroundPosition = JSON.parse(
+          familyData.backgroundPosition,
+        );
+      } else {
+        familyData.backgroundPosition = {
+          x: 0,
+          y: 1,
+          z: 0,
+        };
+      }
       familyData.members = parseMembers(family.members);
 
       return familyData;
@@ -100,6 +111,14 @@ export default {
     } catch (error) {
       console.log(error);
       data.backgroundSize = '{"width": 100, "height": 100}';
+    }
+    try {
+      if (data.backgroundPosition) {
+        data.backgroundPosition = JSON.stringify(data.backgroundPosition);
+      }
+    } catch (error) {
+      console.log(error);
+      data.backgroundPosition = '{"x": 0, "y": 0.1, "z": 0}';
     }
     let family = null;
     try {
@@ -145,6 +164,16 @@ export default {
       result.backgroundSize = {
         width: 100,
         height: 100,
+      };
+    }
+
+    if (result.backgroundPosition) {
+      result.backgroundPosition = JSON.parse(result.backgroundPosition);
+    } else {
+      result.backgroundPosition = {
+        x: 0,
+        y: 1,
+        z: 0,
       };
     }
 

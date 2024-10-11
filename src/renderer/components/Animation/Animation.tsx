@@ -20,6 +20,9 @@ function Animation(props: AnimationProps) {
   const { tree, onContexMenu, updatePositions, family, onUpdateFamily } = props;
   const [planeSizeWidth, setPlaneSizeWidth] = useState(100);
   const [planeSizeHeight, setPlaneSizeHeight] = useState(100);
+  const [backgroundPosition, setBackgroundPosition] = useState(
+    new THREE.Vector3(0, 1, 0),
+  );
   const [dragging, setIsDragging] = useState(false);
   const [objDragging, setObjDragging] = useState<number | boolean>(false);
 
@@ -30,6 +33,7 @@ function Animation(props: AnimationProps) {
 
   const [bgModified, setBgModified] = useState(false);
 
+  // console.log({ family });
   const handleDrag = (
     status: boolean,
     item: Person,
@@ -48,10 +52,16 @@ function Animation(props: AnimationProps) {
     let collitionX = false;
     let collitionY = false;
     tree.forEach((p: Person) => {
-      if (p.position.x < -width / 2 || p.position.x > width / 2) {
+      if (
+        p.position.x < backgroundPosition.x - width / 2 ||
+        p.position.x > backgroundPosition.x + width / 2
+      ) {
         collitionX = true;
       }
-      if (p.position.z < -height / 2 || p.position.z > height / 2) {
+      if (
+        p.position.z < backgroundPosition.z - height / 2 ||
+        p.position.z > backgroundPosition.z + height / 2
+      ) {
         collitionY = true;
       }
     });
@@ -64,10 +74,51 @@ function Animation(props: AnimationProps) {
     }
   };
 
+  const handlePositionChange = (x: number, z: number) => {
+    const newPos = new THREE.Vector3(
+      backgroundPosition.x,
+      1,
+      backgroundPosition.z,
+    );
+
+    let collitionX = false;
+    let collitionY = false;
+    tree.forEach((p: Person) => {
+      if (
+        p.position.x < x - planeSizeWidth / 2 ||
+        p.position.x > x + planeSizeWidth / 2
+      ) {
+        collitionX = true;
+      }
+      if (
+        p.position.z < z - planeSizeHeight / 2 ||
+        p.position.z > z + planeSizeHeight / 2
+      ) {
+        collitionY = true;
+      }
+    });
+    if (!collitionX) {
+      newPos.x = x;
+    }
+    if (!collitionY) {
+      newPos.z = z;
+    }
+
+    setBgModified(true);
+    setBackgroundPosition(newPos);
+  };
+
   useEffect(() => {
     setBgModified(false);
     setPlaneSizeWidth(family.backgroundSize?.width || 100);
     setPlaneSizeHeight(family.backgroundSize?.height || 100);
+    const pos = new THREE.Vector3(0, 0, 0);
+    if (family.backgroundPosition) {
+      pos.x = family.backgroundPosition.x;
+      pos.y = 1;
+      pos.z = family.backgroundPosition.z;
+    }
+    setBackgroundPosition(pos);
   }, [family]);
 
   useEffect(() => {
@@ -78,6 +129,7 @@ function Animation(props: AnimationProps) {
       FamilyService.updateFamily({
         id: family.id,
         backgroundSize: { width: planeSizeWidth, height: planeSizeHeight },
+        backgroundPosition,
       })
         .then((response: any) => {
           onUpdateFamily(response);
@@ -89,7 +141,7 @@ function Animation(props: AnimationProps) {
     }, 300);
 
     return () => clearTimeout(saveData);
-  }, [planeSizeWidth, planeSizeHeight]);
+  }, [planeSizeWidth, planeSizeHeight, backgroundPosition]);
 
   return (
     <Canvas onContextMenu={onContexMenu} shadows>
@@ -150,6 +202,8 @@ function Animation(props: AnimationProps) {
           width={planeSizeWidth}
           height={planeSizeHeight}
           onSizeChange={handleBackgroundSizeChange}
+          onPositionChange={handlePositionChange}
+          position={backgroundPosition}
         />
       </mesh>
     </Canvas>
