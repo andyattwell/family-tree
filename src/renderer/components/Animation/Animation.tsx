@@ -106,7 +106,7 @@ function Animation(props: AnimationProps) {
           enableRotate={false}
           // enableRotate={!dragging}
           panSpeed={0.5}
-          minDistance={20}
+          minDistance={50}
           maxDistance={200}
           minPolarAngle={-Math.PI}
           maxPolarAngle={Math.PI / 4}

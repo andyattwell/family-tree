@@ -15,6 +15,7 @@ export interface Person {
   position: THREE.Vector3;
   parents: Array<Person>;
   children?: Array<Person>;
+  family?: Family;
 }
 
 export interface Family {

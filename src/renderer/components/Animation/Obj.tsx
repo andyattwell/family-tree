@@ -72,7 +72,7 @@ function Obj(props: ObjProps) {
   };
 
   const getMinPosition = () => {
-    let min = -offsetY;
+    let min = -offsetY / 2;
     if (item.parents) {
       item.parents.forEach((p) => {
         const relativeZ = (p.position?.z || 0) + itemSize * 2;
@@ -105,8 +105,10 @@ function Obj(props: ObjProps) {
           } else if (posX > offsetX / 2) {
             posX = offsetX / 2;
           }
-          if (posZ < (offsetY / 2) * -1) {
-            posZ = (offsetY / 2) * -1;
+
+          const minZ = getMinPosition();
+          if (posZ < minZ) {
+            posZ = minZ;
           } else if (posZ > offsetY / 2) {
             posZ = offsetY / 2;
           }

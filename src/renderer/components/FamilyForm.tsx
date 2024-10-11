@@ -1,10 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
-import { Button, Form, FormGroup, FormLabel } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import {
+  Button,
+  Form,
+  FormGroup,
+  FormLabel,
+  Card,
+  CardBody,
+} from 'react-bootstrap';
 import FamilyService from '../services/FamilyService';
 import { Family } from '../types';
 
 interface Props {
-  family: Family;
+  family: Family | undefined;
   onClose: (family: Family) => void;
 }
 
@@ -48,37 +55,49 @@ export default function FamilyForm(props: Props) {
   };
 
   return (
-    <Form>
-      <FormGroup>
-        <FormLabel>
-          Nombre:
-          <input
-            type="text"
-            name="name"
-            className="ms-3"
-            defaultValue={data.title}
-            onChange={handleInputChange}
-          />
-        </FormLabel>
-      </FormGroup>
-      <FormGroup>
-        <FormLabel>
-          Color de fodo:
-          <input
-            type="text"
-            name="backgroundColor"
-            className="ms-3"
-            defaultValue={data.backgroundColor}
-            onChange={handleInputChange}
-          />
-        </FormLabel>
-      </FormGroup>
-      <Button onClick={handleSubmit} variant="primary">
-        Guardar
-      </Button>
-      <Button onClick={handleClose} variant="secondary" className="float-end">
-        Cancelar
-      </Button>
-    </Form>
+    <Card>
+      <CardBody>
+        <Form>
+          <FormGroup className="row mb-3">
+            <div className="col-4">
+              <FormLabel>Nombre:</FormLabel>
+            </div>
+            <div className="col-8">
+              <input
+                type="text"
+                name="title"
+                className="form-control"
+                defaultValue={data.title}
+                onChange={handleInputChange}
+              />
+            </div>
+          </FormGroup>
+          <FormGroup className="row mb-3">
+            <div className="col-4">
+              <FormLabel>Color de fodo:</FormLabel>
+            </div>
+            <div className="col-8">
+              <input
+                type="text"
+                name="backgroundColor"
+                className="form-control"
+                defaultValue={data.backgroundColor}
+                onChange={handleInputChange}
+              />
+            </div>
+          </FormGroup>
+          <Button onClick={handleSubmit} variant="primary">
+            Guardar
+          </Button>
+          <Button
+            onClick={handleClose}
+            variant="secondary"
+            className="float-end"
+          >
+            Cancelar
+          </Button>
+        </Form>
+      </CardBody>
+    </Card>
   );
 }

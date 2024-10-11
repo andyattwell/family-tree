@@ -1,8 +1,19 @@
 import Family from '../Models/Family';
 import Person from '../Models/Person';
 
-function parsePosition(posStr) {
-  return posStr ? JSON.parse(posStr) : { x: 0, y: 1, z: 0 };
+function parsePosition(posStr: string | undefined) {
+  const defaultVal = { x: 0, y: 1, z: 0 };
+  if (!posStr) {
+    return defaultVal;
+  }
+  let obj = null;
+  try {
+    obj = JSON.parse(posStr);
+  } catch (error) {
+    console.log('Error parsing position', { posStr, error });
+  }
+
+  return obj || defaultVal;
 }
 function parseMembers(members: Person[]) {
   return members.map((person: Person) => {
@@ -44,6 +55,10 @@ export default {
                 model: Person,
                 as: 'parents',
               },
+              {
+                model: Family,
+                as: 'family',
+              },
             ],
           },
         ],
@@ -82,7 +97,13 @@ export default {
       if (data.backgroundSize) {
         data.backgroundSize = JSON.stringify(data.backgroundSize);
       }
-      const family = await Family.findOne({
+    } catch (error) {
+      console.log(error);
+      data.backgroundSize = '{"width": 100, "height": 100}';
+    }
+    let family = null;
+    try {
+      family = await Family.findOne({
         where: {
           id: data.id,
         },
@@ -99,12 +120,18 @@ export default {
           },
         ],
       });
-      if (!family) {
-        return {};
-      }
+      await family?.update(data);
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
 
-      await family.update(data);
-      const result = family.dataValues;
+    if (!family) {
+      return {};
+    }
+    const result = family.dataValues;
+
+    try {
       if (result.backgroundSize) {
         result.backgroundSize = JSON.parse(result.backgroundSize);
       } else {
@@ -113,11 +140,21 @@ export default {
           height: 100,
         };
       }
-      result.members = parseMembers(result.members);
-      return result;
     } catch (error) {
-      return error;
+      console.log(error);
+      result.backgroundSize = {
+        width: 100,
+        height: 100,
+      };
     }
+
+    try {
+      result.members = parseMembers(result.members);
+    } catch (error) {
+      console.log(error);
+      result.members = [];
+    }
+    return result;
   },
   async detroy(id: number) {
     try {

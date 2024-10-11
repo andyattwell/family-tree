@@ -24,15 +24,6 @@ html {
 .main-container {
   width: 100vw;
   height: 100vh;
-
-  &.open {
-    #sidebar {
-      width: 400px;
-    }
-    #tree-view {
-      // width: calc(100% - 400px);
-    }
-  }
 }
 
 .context-menu {
@@ -55,39 +46,67 @@ html {
 }
 
 #sidebar {
-  height: 100vh;
-  width: 0;
   position: absolute;
   left: 0;
   top: 0;
-  display: inline-block;
-  z-index: 1;
-  background-color: #232323;
-  color: #fff;
-  text-align: left;
-  overflow-x: hidden;
+  width: 0;
+  height: 100vh;
+  overflow: hidden;
   transition: 0.3s;
   z-index: 10000;
-  zoom: 1 !important;
+  background-color: #232323;
+  color: #fff;
 
-  .sidebar-content {
-    width: 400px;
-    overflow: hidden;
+  scrollbar-width: 6px;
+
+  &.open {
+    width: 520px;
   }
 
-  .sidebar-title {
-    background-color: var(--sidebar-o);
-    height: 50px;
-    color: #fff;
+  .sidebar-close-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
 
-    h3 {
-      margin: 0;
-      padding: 10px 0 0 10px;
+  .nav-tabs {
+    width: 520px;
+    .nav-item {
+      position: relative;
     }
   }
 
-  .sidebar-content {
-    padding: 10px;
+  .close-tab {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+    width: 14px;
+    height: 13px;
+    background: rgb(73, 73, 73);
+    line-height: 11px;
+    font-size: 13px;
+    &:hover {
+      background: rgb(126, 126, 126);
+    }
+  }
+
+  .tab-content {
+    position: relative;
+    height: calc(100vh - 100px);
+    width: 520px;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    .tab-pane {
+      h3 {
+        font-size: 18px;
+        background-color: #000;
+        margin-top: 20px;
+        margin-bottom: 0;
+        padding: 10px;
+      }
+    }
   }
 
   .persona-form {

@@ -5,19 +5,17 @@ import { setTree } from './redux/actions';
 
 import AppNav from './components/AppNav';
 import Sidebar from './components/Sidebar';
-import PersonaForm from './components/PersonaForm';
 import Animation from './components/Animation/Animation';
 import { Family, Person, MenuProps } from './types';
 import PersonMenu from './components/PersonMenu';
 import FamilyForm from './components/FamilyForm';
 import FamilyService from './services/FamilyService';
-import PeopleList from './components/PeopleList';
 
 function App() {
   const [trees, setTrees] = useState<Family[]>([]);
-  const [family, setFamily] = useState<Family | null>(null);
+  const [family, setFamily] = useState<Family | undefined>(undefined);
   const [showSidebar, setShowSidebar] = useState(false);
-  const [persona, setPersona] = useState<Person | null>(null);
+  const [persona, setPersona] = useState<Person | undefined>(undefined);
   const [menu, setMenu] = useState<MenuProps | null>(null);
   const [showFamilyForm, setShowFamilyForm] = useState(false);
   const [load, setLoad] = useState(true);
@@ -38,19 +36,32 @@ function App() {
     setLoad(false);
   }
 
-  const getFamily = useCallback((familyId: number) => {
-    FamilyService.getFamily(familyId)
-      .then((response: any) => {
-        console.log({ response });
-        setFamily(response);
-        return response;
-      })
-      .catch(() => {});
-  }, []);
+  const getFamily = useCallback(
+    (familyId: number) => {
+      FamilyService.getFamily(familyId)
+        .then((response: any) => {
+          setFamily(response);
+          const t = trees.map((f: Family) => {
+            if (f.id === response.id) {
+              return response;
+            }
+            return f;
+          });
+          console.log({ t });
+          setTrees(t);
+          return response;
+        })
+        .catch(() => {});
+    },
+    [trees],
+  );
 
-  const selectFamily = (f: Family, who?: string) => {
-    console.log('selectFamily', who);
-    getFamily(f.id);
+  const selectFamily = (f: Family | undefined) => {
+    if (f) {
+      getFamily(f.id);
+    } else {
+      setFamily(undefined);
+    }
   };
 
   const closeSidebar = (data: any) => {
@@ -58,10 +69,10 @@ function App() {
       getFamily(family.id);
     }
     setShowSidebar(false);
-    setPersona(null);
+    setPersona(undefined);
   };
 
-  const showPersona = (item: Person | null) => {
+  const showPersona = (item: Person | undefined) => {
     setShowSidebar(true);
     setMenu(null);
     setPersona(item);
@@ -128,14 +139,16 @@ function App() {
         }}
       />
 
+      <Sidebar
+        onClose={closeSidebar}
+        show={showSidebar}
+        onSelectFamily={selectFamily}
+        persona={persona}
+        family={family}
+        families={trees}
+      />
+
       <div className={`main-container ${showSidebar ? 'open' : ''}`}>
-        <Sidebar
-          onClose={closeSidebar}
-          show={showSidebar}
-          onSelectFamily={selectFamily}
-          persona={persona}
-          family={family}
-        />
         {menu ? (
           <PersonMenu
             item={menu.item}
