@@ -4,6 +4,7 @@ import FamilyService from '../services/FamilyService';
 import { Family, Person } from '../types';
 import defaultPhoto from '../images/person2.png';
 import trashIcon from '../images/trash.png';
+import { Vector3 } from 'three';
 
 interface Props {
   people: Person[];
@@ -27,7 +28,14 @@ export default function PeopleList(props: Props) {
   };
 
   const addFamilyMember = () => {
-    onShowPersona({ family, familyId: family.id });
+    const posX = family?.backgroundPosition?.x || 0;
+    const posZ = family?.backgroundPosition?.z || 0;
+
+    onShowPersona({
+      family,
+      familyId: family.id,
+      position: new Vector3(posX, 1.3, posZ),
+    });
   };
 
   return (

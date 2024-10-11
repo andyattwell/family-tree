@@ -17,6 +17,7 @@ import FamilyService from '../../services/FamilyService';
 interface ObjProps {
   onDrag: (status: boolean, item: Person, pos: THREE.Vector3) => void;
   onContexMenu: (e: any, item: Person) => void;
+  onSelect: (person: Person) => void;
   item: Person;
   id: number;
   offsetX: number;
@@ -24,20 +25,22 @@ interface ObjProps {
   tree: Person[];
   objDragging: number | boolean;
   selected: Person | undefined;
+  backgroundPosition: THREE.Vector3;
 }
 
 function Obj(props: ObjProps) {
-  const itemSize = 5;
   const posY = 1.5;
   const {
     onDrag,
     onContexMenu,
+    onSelect,
     item,
     offsetX,
     offsetY,
     tree,
     objDragging,
     selected,
+    backgroundPosition,
   } = props;
   const [pos, setPos] = useState(
     new THREE.Vector3(item.position.x, posY, item.position.z),
@@ -45,6 +48,8 @@ function Obj(props: ObjProps) {
   const [isActive, setIsActive] = useState(false);
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersectPoint = new THREE.Vector3();
+  const itemSize = selected && selected.id === item.id ? 8 : 5;
+
   const [spring, api] = useSpring(
     () => ({
       position: pos,
@@ -74,7 +79,7 @@ function Obj(props: ObjProps) {
   };
 
   const getMinPosition = () => {
-    let min = -offsetY / 2;
+    let min = backgroundPosition.z - offsetY / 2;
     if (item.parents) {
       item.parents.forEach((p) => {
         const relativeZ = (p.position?.z || 0) + itemSize * 2;
@@ -102,16 +107,16 @@ function Obj(props: ObjProps) {
           posX = Math.round(planeIntersectPoint.x);
           posZ = Math.round(planeIntersectPoint.z);
 
-          if (posX < (offsetX / 2) * -1) {
-            posX = (offsetX / 2) * -1;
-          } else if (posX > offsetX / 2) {
-            posX = offsetX / 2;
+          if (posX < backgroundPosition.x - offsetX / 2) {
+            posX = backgroundPosition.x - offsetX / 2;
+          } else if (posX > backgroundPosition.x + offsetX / 2) {
+            posX = backgroundPosition.x + offsetX / 2;
           }
 
           const minZ = getMinPosition();
           if (posZ < minZ) {
             posZ = minZ;
-          } else if (posZ > offsetY / 2) {
+          } else if (posZ > backgroundPosition.z + offsetY / 2) {
             posZ = offsetY / 2;
           }
           nextPos = new THREE.Vector3(posX, posY, posZ);
@@ -168,6 +173,9 @@ function Obj(props: ObjProps) {
         onContextMenu={(e) => {
           onContexMenu(e, item);
         }}
+        onClick={(e) => {
+          onSelect(item);
+        }}
       >
         <Photo
           img={item.photo}
@@ -175,12 +183,11 @@ function Obj(props: ObjProps) {
           position={[0, 0.2, -0.5]}
         />
         <Crest selected={selected ? selected.id === item.id : false} />
-        {/* <ObjText
+        <ObjText
           text={item.name || ''}
-          position={new THREE.Vector3(0, 0.2, itemSize + 1)}
-          size={1.3}
-          itemSize={itemSize}
-        /> */}
+          position={new THREE.Vector3(0, 0.25, itemSize + itemSize * 0.3)}
+          selected={selected ? selected.id === item.id : false}
+        />
         {/* <Box
           castShadow
           receiveShadow

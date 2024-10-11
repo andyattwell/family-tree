@@ -4,12 +4,15 @@ import { Vector3 } from 'three';
 interface TextProps {
   text: string;
   position: Vector3;
-  size: number;
-  itemSize: number;
+  selected: boolean;
 }
 export default function ObjText(props: TextProps) {
-  const { text, position, size, itemSize } = props;
+  const { text, position, selected } = props;
   const paragraphs = [text];
+  const width = selected ? 15 : 12;
+  const height = selected ? 8 : 5;
+  const fontSize = selected ? 2 : 1.3;
+  const color = selected ? 'rgb(100,100,0,1)' : 'rgb(0,0,0)';
   return (
     <group position={position}>
       {paragraphs.map((paragraph) => {
@@ -19,10 +22,11 @@ export default function ObjText(props: TextProps) {
               color="white"
               anchorX="center"
               anchorY="middle"
-              fontSize={size}
-              maxWidth={10}
+              fontSize={fontSize}
+              maxWidth={width - 3}
               position={[0, 0.2, 0]}
               rotation={[-Math.PI / 2, 0, 0]}
+              textAlign="center"
             >
               <meshBasicMaterial color="white" fog={false} />
               {paragraph}
@@ -31,8 +35,8 @@ export default function ObjText(props: TextProps) {
         );
       })}
       <mesh position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry attach="geometry" args={[10, itemSize]} />
-        <meshStandardMaterial color={'black'} />
+        <planeGeometry attach="geometry" args={[width, height]} />
+        <meshStandardMaterial color={color} />
       </mesh>
     </group>
   );

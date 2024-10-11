@@ -3,7 +3,7 @@ import FamilyService from '../services/FamilyService';
 import { Family } from '../types';
 import FamilyForm from './FamilyForm';
 import { useState } from 'react';
-import RemoveFamilyIcon from '../images/group-remove.svg';
+import RemoveFamilyIcon from '../images/trash.png';
 
 interface Props {
   families: Family[];
@@ -30,18 +30,10 @@ function FamilyList(props: Props) {
   return (
     <>
       <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Familia</th>
-            <th> </th>
-          </tr>
-        </thead>
         <tbody>
           {families.map((f: Family) => {
             return (
               <tr key={f.title}>
-                <th>{f.id}</th>
                 <th>
                   <button
                     type="button"
@@ -53,27 +45,15 @@ function FamilyList(props: Props) {
                   >
                     {f.title}
                   </button>
-                </th>
-                <th>
                   <button
                     type="button"
-                    className="btn btn-sm btn-outline-primary me-2"
-                    onClick={() => {
-                      onSelectFamily(f);
-                      setShowForm(true);
-                    }}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-outline-danger"
+                    className="btn btn-sm btn-outline-danger float-end"
                     title="Eliminar familia"
                     onClick={() => {
                       deleteFamily(family.id);
                     }}
                   >
-                    <Image src={RemoveFamilyIcon} />
+                    <Image src={RemoveFamilyIcon} width={20} />
                   </button>
                 </th>
               </tr>

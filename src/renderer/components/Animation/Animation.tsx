@@ -14,6 +14,7 @@ interface AnimationProps {
   onContexMenu: (e: any, item?: Person) => void;
   updatePositions: (item: Person, position: THREE.Vector3) => void;
   onUpdateFamily: (family: Family) => void;
+  onSelect: (item: Person) => void;
 }
 
 function Animation(props: AnimationProps) {
@@ -25,6 +26,7 @@ function Animation(props: AnimationProps) {
     onContexMenu,
     updatePositions,
     onUpdateFamily,
+    onSelect,
   } = props;
   const [planeSizeWidth, setPlaneSizeWidth] = useState(100);
   const [planeSizeHeight, setPlaneSizeHeight] = useState(100);
@@ -37,7 +39,11 @@ function Animation(props: AnimationProps) {
   // const [ambientLightIntensity] = useState(Math.PI / 2);
   const [ambientLightIntensity] = useState(3);
   const [pointLightIntensity] = useState(3);
-  const [pointLightPosition] = useState([0, 30, (planeSizeWidth / 2) * -1]);
+  const [pointLightPosition, setLightPosition] = useState([
+    0,
+    30,
+    (planeSizeWidth / 2) * -1,
+  ]);
 
   const [bgModified, setBgModified] = useState(false);
 
@@ -161,6 +167,11 @@ function Animation(props: AnimationProps) {
         });
     }, 300);
 
+    setLightPosition([
+      backgroundPosition.x,
+      30,
+      backgroundPosition.z - planeSizeWidth / 2 - 10,
+    ]);
     return () => clearTimeout(saveData);
   }, [planeSizeWidth, planeSizeHeight, backgroundPosition]);
 
@@ -211,8 +222,10 @@ function Animation(props: AnimationProps) {
                   key={item.id}
                   offsetX={planeSizeWidth}
                   offsetY={planeSizeHeight}
+                  backgroundPosition={backgroundPosition}
                   tree={tree}
                   selected={selected}
+                  onSelect={onSelect}
                 />
               </group>
             );

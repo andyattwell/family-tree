@@ -68,7 +68,7 @@ function App() {
       getFamily(family.id);
     }
     setShowSidebar(!showSidebar);
-    setPersona(undefined);
+    // setPersona(undefined);
   };
 
   const showPersona = (item: Person | undefined) => {
@@ -175,6 +175,9 @@ function App() {
               updatePositions={updatePositions}
               onUpdateFamily={setFamily}
               selected={persona}
+              onSelect={(person: Person) => {
+                setPersona(person);
+              }}
             />
           ) : (
             ''
