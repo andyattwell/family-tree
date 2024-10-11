@@ -47,7 +47,6 @@ function App() {
             }
             return f;
           });
-          console.log({ t });
           setTrees(t);
           return response;
         })

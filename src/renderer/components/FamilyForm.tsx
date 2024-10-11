@@ -36,7 +36,11 @@ export default function FamilyForm(props: Props) {
     if (!data.title || data.title === '') {
       return;
     }
-
+    // data.backgroundPosition = {
+    //   x: 0,
+    //   y: 1,
+    //   z: 0,
+    // };
     console.log({ data });
     FamilyService.updateFamily(data)
       .then((response: any) => {

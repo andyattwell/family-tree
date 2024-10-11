@@ -34,7 +34,7 @@ interface ObjProps {
 
 function Obj(props: ObjProps) {
   const itemSize = 5;
-  const posY = 1;
+  const posY = 1.5;
   const { onDrag, onContexMenu, item, offsetX, offsetY, tree, objDragging } =
     props;
   const [pos, setPos] = useState(

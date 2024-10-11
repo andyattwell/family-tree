@@ -7,7 +7,7 @@ import * as THREE from 'three';
 
 interface CornerProps {
   position: Vector3;
-  onSizeChange: (x: number, z: number) => void;
+  onSizeChange: (active: boolean, x: number, z: number) => void;
   invertX: boolean;
   invertY: boolean;
   name: string;
@@ -22,10 +22,10 @@ function Corner(props: CornerProps) {
       try {
         if (active) {
           event.ray.intersectPlane(floorPlane, planeIntersectPoint);
-          const posX = Math.round(Math.abs(planeIntersectPoint.x)) * 2;
-          const posZ = Math.round(Math.abs(planeIntersectPoint.z)) * 2;
-          onSizeChange(posX, posZ);
         }
+        const posX = Math.round(Math.abs(planeIntersectPoint.x)) * 2;
+        const posZ = Math.round(Math.abs(planeIntersectPoint.z)) * 2;
+        onSizeChange(active, posX, posZ);
         api.start({ position });
       } catch (error) {
         console.log('ERROR', error);
@@ -50,7 +50,7 @@ function Corner(props: CornerProps) {
 
 interface BackgroundDragProps {
   position: Vector3;
-  onPositionChange: (x: number, z: number) => void;
+  onPositionChange: (active: boolean, x: number, z: number) => void;
 }
 function BackgroundDrag(props: BackgroundDragProps) {
   const { position, onPositionChange } = props;
@@ -60,12 +60,14 @@ function BackgroundDrag(props: BackgroundDragProps) {
   const bind = useDrag(
     ({ active, movement: [x, y], event }) => {
       try {
+        let posX = planeIntersectPoint.x;
+        let posZ = planeIntersectPoint.x;
         if (active) {
           event.ray.intersectPlane(floorPlane, planeIntersectPoint);
-          const posX = Math.round(planeIntersectPoint.x);
-          const posZ = Math.round(planeIntersectPoint.z);
-          onPositionChange(posX, posZ);
+          posX = Math.round(planeIntersectPoint.x);
+          posZ = Math.round(planeIntersectPoint.z);
         }
+        onPositionChange(active, posX, posZ);
         api.start({ position });
       } catch (error) {
         console.log('ERROR', error);
@@ -88,8 +90,8 @@ interface BackgroundProps {
   width: number;
   height: number;
   position: Vector3;
-  onSizeChange: (width: number, height: number) => void;
-  onPositionChange: (x: number, z: number) => void;
+  onSizeChange: (active: boolean, width: number, height: number) => void;
+  onPositionChange: (active: boolean, x: number, z: number) => void;
 }
 
 function Background(props: BackgroundProps) {
@@ -155,16 +157,18 @@ function Background(props: BackgroundProps) {
   const minHeight = 60;
   const maxHeight = 400;
 
-  const handleSizeChange = (x: number, z: number) => {
+  const handleSizeChange = (active: boolean, x: number, z: number) => {
     let nextWidth = width;
     let nextHeight = height;
-    nextWidth = Math.min(Math.max(x, minWidth), maxWidth);
-    nextHeight = Math.min(Math.max(z, minHeight), maxHeight);
-    onSizeChange(nextWidth, nextHeight);
+    if (active) {
+      nextWidth = Math.min(Math.max(x, minWidth), maxWidth);
+      nextHeight = Math.min(Math.max(z, minHeight), maxHeight);
+    }
+    onSizeChange(active, nextWidth, nextHeight);
   };
 
-  const handlePositionChange = (x: number, z: number) => {
-    onPositionChange(x, z);
+  const handlePositionChange = (active: boolean, x: number, z: number) => {
+    onPositionChange(active, x, z + height / 2);
   };
 
   return (

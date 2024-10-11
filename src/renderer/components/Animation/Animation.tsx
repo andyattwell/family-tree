@@ -48,7 +48,15 @@ function Animation(props: AnimationProps) {
     }
   };
 
-  const handleBackgroundSizeChange = (width: number, height: number) => {
+  const handleBackgroundSizeChange = (
+    active: boolean,
+    width: number,
+    height: number,
+  ) => {
+    setIsDragging(active);
+    if (!active) {
+      return;
+    }
     let collitionX = false;
     let collitionY = false;
     tree.forEach((p: Person) => {
@@ -65,6 +73,7 @@ function Animation(props: AnimationProps) {
         collitionY = true;
       }
     });
+
     setBgModified(true);
     if (!collitionX) {
       setPlaneSizeWidth(width);
@@ -74,7 +83,11 @@ function Animation(props: AnimationProps) {
     }
   };
 
-  const handlePositionChange = (x: number, z: number) => {
+  const handlePositionChange = (active: boolean, x: number, z: number) => {
+    setIsDragging(active);
+    if (!active) {
+      return;
+    }
     const newPos = new THREE.Vector3(
       backgroundPosition.x,
       1,
@@ -155,10 +168,10 @@ function Animation(props: AnimationProps) {
         <OrbitControls
           // enablePan={!dragging}
           enablePan={!dragging}
-          enableRotate={false}
+          enableRotate={!dragging}
           // enableRotate={!dragging}
           panSpeed={0.5}
-          minDistance={50}
+          minDistance={10}
           maxDistance={200}
           minPolarAngle={-Math.PI}
           maxPolarAngle={Math.PI / 4}
