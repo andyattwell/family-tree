@@ -63,17 +63,23 @@ function App() {
     }
   };
 
-  const closeSidebar = (data: any) => {
+  const toggleSidebar = (data: any) => {
     if (family && data) {
       getFamily(family.id);
     }
-    setShowSidebar(false);
+    setShowSidebar(!showSidebar);
     setPersona(undefined);
   };
 
   const showPersona = (item: Person | undefined) => {
+    if (persona) {
+      persona.selected = false;
+    }
     setShowSidebar(true);
     setMenu(null);
+    if (item) {
+      item.selected = true;
+    }
     setPersona(item);
   };
 
@@ -139,9 +145,10 @@ function App() {
       />
 
       <Sidebar
-        onClose={closeSidebar}
+        onToggle={toggleSidebar}
         show={showSidebar}
         onSelectFamily={selectFamily}
+        onSelectPerson={showPersona}
         persona={persona}
         family={family}
         families={trees}
@@ -167,6 +174,7 @@ function App() {
               family={family}
               updatePositions={updatePositions}
               onUpdateFamily={setFamily}
+              selected={persona}
             />
           ) : (
             ''

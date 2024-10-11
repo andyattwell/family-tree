@@ -47,11 +47,10 @@ html {
 
 #sidebar {
   position: absolute;
-  left: 0;
+  left: -520px;
   top: 0;
-  width: 0;
+  width: 520px;
   height: 100vh;
-  overflow: hidden;
   transition: 0.3s;
   z-index: 10000;
   background-color: #232323;
@@ -60,13 +59,18 @@ html {
   scrollbar-width: 6px;
 
   &.open {
-    width: 520px;
+    left: 0;
   }
 
-  .sidebar-close-btn {
+  .sidebar-toggle-btn {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 9px;
+    right: -40px;
+    border-radius: 0;
+    background: #000;
+    border: none;
+    width: 40px;
+    height: 40px;
   }
 
   .nav-tabs {

@@ -6,7 +6,7 @@ import { Mesh } from 'three';
 import model from '../../models/escudo.obj';
 import mat from '../../models/escudo.mtl';
 
-export default function Crest() {
+export default function Crest({ selected }: { selected: boolean }) {
   const material = useLoader(MTLLoader, mat);
   const obj = useLoader(OBJLoader, model, (loader: any) => {
     material.preload();
@@ -20,8 +20,9 @@ export default function Crest() {
       }
     });
   }
+  const size = selected ? 3 : 2;
   return (
-    <mesh position={[0, 0, 0]} scale={[2, 2, 2]} castShadow>
+    <mesh position={[0, 0, 0]} scale={[size, size, size]} castShadow>
       <primitive object={obj.clone()} />
     </mesh>
   );

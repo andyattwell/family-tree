@@ -30,7 +30,6 @@ function ParentsList(props: ParentsListProps) {
     }
     setShowSelect(false);
   };
-  console.log(item);
 
   const removeParent = (parent: Person) => {
     console.log('removeParent', parent);

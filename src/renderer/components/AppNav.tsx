@@ -44,9 +44,9 @@ function AppNav(props: AppNavProps) {
     <Navbar bg="dark" data-bs-theme="dark">
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
-        <NavLink onClick={onShowPeople} className="text-white">
+        {/* <NavLink onClick={onShowPeople} className="text-white">
           Menú
-        </NavLink>
+        </NavLink> */}
         {/* <Nav className="me-auto">
           <NavDropdown
             title={family ? family?.title : 'Familias'}
@@ -80,7 +80,7 @@ function AppNav(props: AppNavProps) {
         </Nav> */}
         {family?.id ? (
           <>
-            <Nav className="">
+            <Nav className="ms-5">
               <NavLink
                 onClick={addPerson}
                 className="bg-success text-white"

@@ -10,6 +10,7 @@ import FamilyService from '../../services/FamilyService';
 interface AnimationProps {
   tree: Person[];
   family: Family;
+  selected: Person | undefined;
   onContexMenu: (e: any, item?: Person) => void;
   updatePositions: (item: Person, position: THREE.Vector3) => void;
   onUpdateFamily: (family: Family) => void;
@@ -17,7 +18,14 @@ interface AnimationProps {
 
 function Animation(props: AnimationProps) {
   extend(THREE);
-  const { tree, onContexMenu, updatePositions, family, onUpdateFamily } = props;
+  const {
+    tree,
+    family,
+    selected,
+    onContexMenu,
+    updatePositions,
+    onUpdateFamily,
+  } = props;
   const [planeSizeWidth, setPlaneSizeWidth] = useState(100);
   const [planeSizeHeight, setPlaneSizeHeight] = useState(100);
   const [backgroundPosition, setBackgroundPosition] = useState(
@@ -204,6 +212,7 @@ function Animation(props: AnimationProps) {
                   offsetX={planeSizeWidth}
                   offsetY={planeSizeHeight}
                   tree={tree}
+                  selected={selected}
                 />
               </group>
             );

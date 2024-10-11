@@ -16,6 +16,7 @@ export interface Person {
   parents: Array<Person>;
   children?: Array<Person>;
   family?: Family;
+  selected?: boolean;
 }
 
 export interface Family {

@@ -23,20 +23,22 @@ interface ObjProps {
   offsetY: number;
   tree: Person[];
   objDragging: number | boolean;
-  // updatePositions: (
-  //   id: number,
-  //   x: number,
-  //   y: number,
-  //   z: number,
-  //   offset: number,
-  // ) => void;
+  selected: Person | undefined;
 }
 
 function Obj(props: ObjProps) {
   const itemSize = 5;
   const posY = 1.5;
-  const { onDrag, onContexMenu, item, offsetX, offsetY, tree, objDragging } =
-    props;
+  const {
+    onDrag,
+    onContexMenu,
+    item,
+    offsetX,
+    offsetY,
+    tree,
+    objDragging,
+    selected,
+  } = props;
   const [pos, setPos] = useState(
     new THREE.Vector3(item.position.x, posY, item.position.z),
   );
@@ -167,8 +169,12 @@ function Obj(props: ObjProps) {
           onContexMenu(e, item);
         }}
       >
-        <Photo img={item.photo} size={3.5} position={[0, 0.2, -0.5]} />
-        <Crest />
+        <Photo
+          img={item.photo}
+          size={selected && selected.id === item.id ? 5 : 3.5}
+          position={[0, 0.2, -0.5]}
+        />
+        <Crest selected={selected ? selected.id === item.id : false} />
         {/* <ObjText
           text={item.name || ''}
           position={new THREE.Vector3(0, 0.2, itemSize + 1)}

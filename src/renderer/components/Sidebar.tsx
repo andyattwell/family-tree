@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import { Image } from 'react-bootstrap';
 import { Family, Person } from '../types';
 import PersonaForm from './PersonaForm';
-import PeopleList from './PeopleList';
-import FamilyForm from './FamilyForm';
 import FamilyList from './FamilyList';
 import FamilyTab from './Tabs/FamilyTab';
+import menuIcon from '../images/menu-icon.png';
+import menuOpenIcon from '../images/menu-open-icon.png';
 
 interface Props {
   show: boolean;
-  onClose: (arg?: any) => void;
+  onToggle: (arg?: any) => void;
   onSelectFamily: (family: Family | undefined) => void;
+  onSelectPerson: (person: Person | undefined) => void;
   families: Family[];
   persona: Person | undefined;
   family: Family | undefined;
@@ -22,8 +24,9 @@ function Sidebar({
   families,
   persona,
   family,
-  onClose,
+  onToggle,
   onSelectFamily,
+  onSelectPerson,
 }: Props) {
   const [editPerson, setEditPerson] = useState<Person | undefined>(persona);
   const [showPeople, setShowPeople] = useState(true);
@@ -53,6 +56,7 @@ function Sidebar({
     setEditPerson(undefined);
     setShowPeople(true);
     onSelectFamily(family);
+    onSelectPerson(undefined);
   };
 
   const changeFamily = (fa: Family | undefined) => {
@@ -93,10 +97,10 @@ function Sidebar({
     <div id="sidebar" className={show ? 'open' : ''}>
       <button
         type="button"
-        className="btn btn-sm float-end btn-outline-secondary sidebar-close-btn"
-        onClick={onClose}
+        className="btn btn-sm float-end btn-outline-secondary sidebar-toggle-btn"
+        onClick={onToggle}
       >
-        &times;
+        <Image src={!show ? menuIcon : menuOpenIcon} width={20} />
       </button>
       <Tabs
         defaultActiveKey="familias"
@@ -123,6 +127,7 @@ function Sidebar({
               onSelectPerson={(p: Person | undefined) => {
                 setEditPerson(p);
                 setShowPeople(false);
+                onSelectPerson(p);
               }}
             />
           </Tab>
