@@ -26,6 +26,7 @@ export interface Family {
   photo?: string;
   backgroundImage?: string;
   backgroundColor?: string;
+  itemColor?: string;
   backgroundSize?: {
     width: number;
     height: number;

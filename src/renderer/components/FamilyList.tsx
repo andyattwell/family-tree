@@ -1,8 +1,7 @@
+import { useState } from 'react';
 import { Table, Image } from 'react-bootstrap';
 import FamilyService from '../services/FamilyService';
 import { Family } from '../types';
-import FamilyForm from './FamilyForm';
-import { useState } from 'react';
 import RemoveFamilyIcon from '../images/trash.png';
 
 interface Props {
@@ -28,7 +27,20 @@ function FamilyList(props: Props) {
   };
 
   return (
-    <>
+    <div>
+      <button
+        type="button"
+        className="btn btn-success"
+        onClick={() => {
+          onSelectFamily({
+            title: '',
+            backgroundColor: 'grey',
+            itemColor: 'red',
+          } as Family);
+        }}
+      >
+        Agregar
+      </button>
       <Table striped bordered hover>
         <tbody>
           {families.map((f: Family) => {
@@ -40,7 +52,6 @@ function FamilyList(props: Props) {
                     className="btn btn-outline"
                     onClick={() => {
                       onSelectFamily(f);
-                      setShowForm(false);
                     }}
                   >
                     {f.title}
@@ -61,17 +72,7 @@ function FamilyList(props: Props) {
           })}
         </tbody>
       </Table>
-
-      <button
-        type="button"
-        className="btn btn-success"
-        onClick={() => {
-          setShowForm(true);
-        }}
-      >
-        Agregar
-      </button>
-    </>
+    </div>
   );
 }
 

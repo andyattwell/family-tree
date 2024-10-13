@@ -24,7 +24,12 @@ export default function PersonMenu(props: MenuProps) {
     onAddPerson({
       parents: [item],
       familyId: Number(item.familyId),
-      position: new Vector3(item.position?.x, 0.1, (item.position?.z || 0) + 2),
+      family: item.family,
+      position: new Vector3(
+        item.position?.x,
+        0.1,
+        (item.position?.z || 0) + 12,
+      ),
     });
   };
 

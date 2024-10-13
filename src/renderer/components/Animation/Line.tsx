@@ -91,9 +91,12 @@ export function Lines(props: LinesProps) {
 
   const itemZ = item.position?.z || 0;
   const y = 1.1;
+  const minZ = 12;
   return connections.map((conPerson: Person) => {
     const key = (item.id || 0) + (conPerson.id || 0);
 
+    const diff = (item.position.z - conPerson.position.z) / 2;
+    const startZ = conPerson.position.z + minZ;
     return (
       <mesh key={key}>
         {/* <PlaneLine
@@ -110,15 +113,15 @@ export function Lines(props: LinesProps) {
         /> */}
         <Line
           start={[item.position.x, y, itemZ]}
-          end={[item.position.x, y, conPerson.position.z + 3]}
+          end={[item.position.x, y, startZ]}
         />
         <Line
-          start={[item.position.x, y, conPerson.position.z + 3]}
-          end={[conPerson.position.x, y, conPerson.position.z + 3]}
+          start={[item.position.x, y, startZ]}
+          end={[conPerson.position.x, y, startZ]}
         />
         <Line
           start={[conPerson.position.x, y, conPerson.position.z + 1]}
-          end={[conPerson.position.x, y, conPerson.position.z + 3]}
+          end={[conPerson.position.x, y, startZ]}
         />
       </mesh>
     );

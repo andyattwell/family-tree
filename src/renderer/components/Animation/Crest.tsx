@@ -1,15 +1,22 @@
 import { useLoader } from '@react-three/fiber';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
-import { Mesh, MeshBasicMaterial, MeshStandardMaterial } from 'three';
+import { Mesh, MeshStandardMaterial } from 'three';
 
 import model from '../../models/escudo.obj';
-import mat from '../../models/escudo.mtl';
+// import mat from '../../models/escudo.mtl';
 
-export default function Crest({ selected }: { selected: boolean }) {
+export default function Crest({
+  selected,
+  color,
+}: {
+  selected: boolean;
+  color: string;
+}) {
   // const material = useLoader(MTLLoader, mat);
+  //'#9ab7a4'
   const material = new MeshStandardMaterial({
-    color: selected ? 'yellow' : 'red',
+    color: selected ? 'yellow' : color,
     metalness: 1.3,
   });
   const obj = useLoader(OBJLoader, model);
@@ -27,9 +34,14 @@ export default function Crest({ selected }: { selected: boolean }) {
       }
     });
   }
-  const size = selected ? 3 : 2;
+  const size = 2;
   return (
-    <mesh position={[0, 0, 0]} scale={[size, size, size]} castShadow>
+    <mesh
+      position={[0, 0, 0]}
+      scale={[size, size, size]}
+      castShadow
+      receiveShadow
+    >
       <primitive object={obj.clone()} />
     </mesh>
   );

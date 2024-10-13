@@ -153,7 +153,7 @@ function Animation(props: AnimationProps) {
       if (!bgModified) {
         return;
       }
-      FamilyService.updateFamily({
+      FamilyService.saveFamily({
         id: family.id,
         backgroundSize: { width: planeSizeWidth, height: planeSizeHeight },
         backgroundPosition,
@@ -187,7 +187,7 @@ function Animation(props: AnimationProps) {
         <OrbitControls
           // enablePan={!dragging}
           enablePan={!dragging}
-          enableRotate={!dragging}
+          enableRotate={false}
           // enableRotate={!dragging}
           panSpeed={0.5}
           minDistance={10}
@@ -224,6 +224,7 @@ function Animation(props: AnimationProps) {
                   offsetY={planeSizeHeight}
                   backgroundPosition={backgroundPosition}
                   tree={tree}
+                  color={family?.itemColor || 'red'}
                   selected={selected}
                   onSelect={onSelect}
                 />

@@ -56,10 +56,10 @@ function App() {
   );
 
   const selectFamily = (f: Family | undefined) => {
-    if (f) {
+    if (f?.id) {
       getFamily(f.id);
     } else {
-      setFamily(undefined);
+      setFamily(f);
     }
   };
 
@@ -68,7 +68,6 @@ function App() {
       getFamily(family.id);
     }
     setShowSidebar(!showSidebar);
-    // setPersona(undefined);
   };
 
   const showPersona = (item: Person | undefined) => {
@@ -118,6 +117,7 @@ function App() {
       });
     } else {
       setMenu(null);
+      setPersona(undefined);
     }
   };
 

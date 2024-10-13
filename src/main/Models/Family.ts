@@ -12,7 +12,8 @@ Family.init(familySchema, {
 (async () => {
   try {
     // await Family.sync({ force: true });
-    // await Family.sync({ alter: true });
+    await Family.sync({ alter: true });
+    // await Family.sync();
   } catch (error) {
     console.log('ERROR', error);
   }

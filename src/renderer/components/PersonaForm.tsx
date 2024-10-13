@@ -22,12 +22,8 @@ interface ParentsListProps {
 function ParentsList(props: ParentsListProps) {
   const [showSelect, setShowSelect] = useState(false);
   const { item, tree, onAdd, onRemove } = props;
-  const addParent = (e) => {
-    const pid = Number(e.target.value);
-    const per = tree.find((p) => p.id === pid);
-    if (per) {
-      onAdd(per);
-    }
+  const addParent = (persona: Person) => {
+    onAdd(persona);
     setShowSelect(false);
   };
 
@@ -76,16 +72,12 @@ function ParentsList(props: ParentsListProps) {
       </ListGroup>
 
       {showSelect ? (
-        <>
-          <PersonSelect onSelect={addParent} tree={tree} person={item} />
-          <Button
-            variant="secondary"
-            className="btn-sm"
-            onClick={() => setShowSelect(false)}
-          >
-            Cerrar
-          </Button>
-        </>
+        <PersonSelect
+          onSelect={addParent}
+          tree={tree}
+          person={item}
+          onClose={() => setShowSelect(false)}
+        />
       ) : (
         ''
       )}
@@ -139,7 +131,7 @@ function PersonaForm(props: PersonaFormProps) {
 
   const handleAddParent = (parent: Person) => {
     const d = { ...data };
-    d.parents = data.parents;
+    d.parents = data.parents || [];
     d.parents.push(parent);
     setData(d);
   };
@@ -155,7 +147,7 @@ function PersonaForm(props: PersonaFormProps) {
         const d = { ...data };
         d.parents = data.parents.filter((p: Person) => p.id !== parent.id);
         setData(d);
-        onClose(d);
+        // onClose(d);
         return response;
       })
       .catch((error) => {
@@ -228,6 +220,7 @@ function PersonaForm(props: PersonaFormProps) {
         data.id = response.id;
         if (data.parents?.length) {
           data.parents.forEach((parent: Person) => {
+            console.log('data', d);
             handleSaveParents(parent);
           });
         }
@@ -389,41 +382,6 @@ function PersonaForm(props: PersonaFormProps) {
         ''
       )}
 
-      {/* Position */}
-      {/* <div className="form-group mb-3">
-        <div className="row">
-          <div className="col-4">
-            <label className="control-label">X</label>
-            <input
-              className="form-control"
-              type="number"
-              name="z"
-              defaultValue={data.position.x}
-              onChange={handlePositionChange}
-            />
-          </div>
-          <div className="col-4">
-            <label className="control-label">Y</label>
-            <input
-              className="form-control"
-              type="number"
-              name="y"
-              defaultValue={data.position.y}
-              onChange={handlePositionChange}
-            />
-          </div>
-          <div className="col-4">
-            <label className="control-label">Z</label>
-            <input
-              className="form-control"
-              type="number"
-              name="z"
-              defaultValue={data.position.z}
-              onChange={handlePositionChange}
-            />
-          </div>
-        </div>
-      </div> */}
       {errors.length ? (
         <Alert variant="danger">
           <ul>

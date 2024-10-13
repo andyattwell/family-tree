@@ -24,8 +24,6 @@ const schema = {
   },
 };
 
-// const PersonParents = sequelize.define('PersonParents', schema);
-
 class PersonParents extends Model {}
 
 PersonParents.init(schema, {
@@ -36,8 +34,8 @@ PersonParents.init(schema, {
 
 (async () => {
   try {
-    // await Person.sync();
     // await PersonParents.sync({ force: true });
+    await PersonParents.sync();
   } catch (error) {
     console.log('ERROR', error);
   }

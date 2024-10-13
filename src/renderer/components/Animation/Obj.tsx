@@ -26,6 +26,7 @@ interface ObjProps {
   objDragging: number | boolean;
   selected: Person | undefined;
   backgroundPosition: THREE.Vector3;
+  color: string;
 }
 
 function Obj(props: ObjProps) {
@@ -41,6 +42,7 @@ function Obj(props: ObjProps) {
     objDragging,
     selected,
     backgroundPosition,
+    color,
   } = props;
   const [pos, setPos] = useState(
     new THREE.Vector3(item.position.x, posY, item.position.z),
@@ -48,7 +50,7 @@ function Obj(props: ObjProps) {
   const [isActive, setIsActive] = useState(false);
   const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersectPoint = new THREE.Vector3();
-  const itemSize = selected && selected.id === item.id ? 8 : 5;
+  const itemSize = 5;
 
   const [spring, api] = useSpring(
     () => ({
@@ -177,12 +179,11 @@ function Obj(props: ObjProps) {
           onSelect(item);
         }}
       >
-        <Photo
-          img={item.photo}
-          size={selected && selected.id === item.id ? 5 : 3.5}
-          position={[0, 0.2, -0.5]}
+        <Photo img={item.photo} size={4} position={[0, 0.2, -0.5]} />
+        <Crest
+          selected={selected ? selected.id === item.id : false}
+          color={color}
         />
-        <Crest selected={selected ? selected.id === item.id : false} />
         <ObjText
           text={item.name || ''}
           position={new THREE.Vector3(0, 0.25, itemSize + itemSize * 0.3)}

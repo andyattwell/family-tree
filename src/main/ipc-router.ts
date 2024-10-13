@@ -37,7 +37,7 @@ const routes = [
   },
   {
     channel: 'ipc-family-delete',
-    callback: FamilyController.detroy,
+    callback: FamilyController.destroy,
   },
   {
     channel: 'ipc-family-update',

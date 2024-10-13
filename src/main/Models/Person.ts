@@ -70,6 +70,7 @@ Person.belongsToMany(Person, {
     // });
     // person3.addParents([person1, person2]);
     // await Person.sync({ alter: true })
+    await Person.sync();
   } catch (error) {
     console.log('ERROR', error);
   }

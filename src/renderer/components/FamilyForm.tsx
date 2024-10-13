@@ -42,7 +42,7 @@ export default function FamilyForm(props: Props) {
     //   z: 0,
     // };
     console.log({ data });
-    FamilyService.updateFamily(data)
+    FamilyService.saveFamily(data)
       .then((response: any) => {
         console.log({ response });
 
@@ -86,6 +86,20 @@ export default function FamilyForm(props: Props) {
                 name="backgroundColor"
                 className="form-control"
                 defaultValue={data.backgroundColor}
+                onChange={handleInputChange}
+              />
+            </div>
+          </FormGroup>
+          <FormGroup className="row mb-3">
+            <div className="col-4">
+              <FormLabel>Color de cosito:</FormLabel>
+            </div>
+            <div className="col-8">
+              <input
+                type="text"
+                name="itemColor"
+                className="form-control"
+                defaultValue={data.itemColor}
                 onChange={handleInputChange}
               />
             </div>

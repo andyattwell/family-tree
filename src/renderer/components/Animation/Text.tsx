@@ -9,9 +9,9 @@ interface TextProps {
 export default function ObjText(props: TextProps) {
   const { text, position, selected } = props;
   const paragraphs = [text];
-  const width = selected ? 15 : 12;
-  const height = selected ? 8 : 5;
-  const fontSize = selected ? 2 : 1.3;
+  const width = 12;
+  const height = 5;
+  const fontSize = 1.3;
   const color = selected ? 'rgb(100,100,0,1)' : 'rgb(0,0,0)';
   return (
     <group position={position}>

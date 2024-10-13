@@ -66,7 +66,7 @@ const configuration: webpack.Configuration = {
       },
       // Models
       {
-        test: /\.(glb|gltf)$/i,
+        test: /\.(glb|gltf|bin|obj|mtl)$/i,
         type: 'asset/resource',
       },
       // Images

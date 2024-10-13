@@ -15,6 +15,9 @@ export default {
   backgroundColor: {
     type: DataTypes.STRING,
   },
+  itemColor: {
+    type: DataTypes.STRING,
+  },
   backgroundSize: {
     type: DataTypes.STRING,
   },
