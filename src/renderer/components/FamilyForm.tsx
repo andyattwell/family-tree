@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import ColorPicker from './ColorPicker';
 import {
   Button,
   Form,
@@ -18,6 +19,8 @@ interface Props {
 export default function FamilyForm(props: Props) {
   const { onClose, family } = props;
   const [data, setData] = useState<any>({});
+  const [showBgPicker, setShowBgPicker] = useState(false);
+  const [showItemPicker, setShowItemPicker] = useState(false);
 
   useEffect(() => {
     setData({ ...family });
@@ -36,16 +39,8 @@ export default function FamilyForm(props: Props) {
     if (!data.title || data.title === '') {
       return;
     }
-    // data.backgroundPosition = {
-    //   x: 0,
-    //   y: 1,
-    //   z: 0,
-    // };
-    console.log({ data });
     FamilyService.saveFamily(data)
       .then((response: any) => {
-        console.log({ response });
-
         onClose(response);
         return response;
       })
@@ -56,6 +51,12 @@ export default function FamilyForm(props: Props) {
 
   const handleClose = () => {
     onClose();
+  };
+
+  const updateColor = (attr: string, color: string) => {
+    const arr = data;
+    arr[attr] = color;
+    setData(arr);
   };
 
   return (
@@ -81,12 +82,19 @@ export default function FamilyForm(props: Props) {
               <FormLabel>Color de fodo:</FormLabel>
             </div>
             <div className="col-8">
-              <input
-                type="text"
-                name="backgroundColor"
-                className="form-control"
-                defaultValue={data.backgroundColor}
-                onChange={handleInputChange}
+              <ColorPicker
+                defaultColor={data.backgroundColor}
+                onChange={(c: string) => {
+                  updateColor('backgroundColor', c);
+                  setShowBgPicker(false);
+                }}
+                onCancel={() => {
+                  setShowBgPicker(false);
+                }}
+                show={showBgPicker}
+                onShow={() => {
+                  setShowBgPicker(true);
+                }}
               />
             </div>
           </FormGroup>
@@ -95,12 +103,19 @@ export default function FamilyForm(props: Props) {
               <FormLabel>Color de cosito:</FormLabel>
             </div>
             <div className="col-8">
-              <input
-                type="text"
-                name="itemColor"
-                className="form-control"
-                defaultValue={data.itemColor}
-                onChange={handleInputChange}
+              <ColorPicker
+                defaultColor={data.itemColor}
+                onChange={(c: string) => {
+                  updateColor('itemColor', c);
+                  setShowItemPicker(false);
+                }}
+                onCancel={() => {
+                  setShowItemPicker(false);
+                }}
+                show={showItemPicker}
+                onShow={() => {
+                  setShowItemPicker(true);
+                }}
               />
             </div>
           </FormGroup>

@@ -16,7 +16,7 @@ function FamilyList(props: Props) {
   const [showForm, setShowForm] = useState(false);
 
   const deleteFamily = (id: number) => {
-    FamilyService.deletePerson(id)
+    FamilyService.deleteFamily(id)
       .then((response: any) => {
         onDelete();
         return response;
@@ -61,7 +61,7 @@ function FamilyList(props: Props) {
                     className="btn btn-sm btn-outline-danger float-end"
                     title="Eliminar familia"
                     onClick={() => {
-                      deleteFamily(family.id);
+                      deleteFamily(f.id);
                     }}
                   >
                     <Image src={RemoveFamilyIcon} width={20} />
